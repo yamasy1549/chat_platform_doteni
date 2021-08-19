@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+  <ul class=entries>
+  {% for entry in entries %}
+    <li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}<a href="{{ url_for('entries.edit', entry_id=entry.id) }}">編集</a></li>
+  {% else %}
+    <li><em>Entryがありません。</em>
+  {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('entries.create') }}">エントリ新規登録</a>
+{% endblock %}

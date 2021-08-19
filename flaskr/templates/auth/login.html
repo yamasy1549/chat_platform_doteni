@@ -1,15 +1,13 @@
-{% extends 'base.html' %}
-
-{% block header %}
-  <h1>{% block title %}ログイン{% endblock %}</h1>
-{% endblock %}
-
-{% block content %}
-  <form method="post">
-    <label for="username">ユーザ名</label>
-    <input name="username" id="username" required>
-    <label for="password">パスワード</label>
-    <input type="password" name="password" id="password" required>
-    <input type="submit" value="ログイン">
+{% extends "layout.html" %}
+{% block body %}
+  <h2>ログイン</h2>
+  <form action="{{ url_for('auth.login') }}" method=post>
+    <dl>
+      <dt>メールアドレス:
+      <dd><input type=text name=email>
+      <dt>パスワード:
+      <dd><input type=password name=password>
+      <dd><input type=submit value="ログイン">
+    </dl>
   </form>
 {% endblock %}

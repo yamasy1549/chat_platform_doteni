@@ -1,0 +1,19 @@
+<!doctype html>
+<title>対話プラットフォーム</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>対話プラットフォーム</h1>
+  {% if session.user_id %}
+    <a href="{{ url_for('entries.index') }}">エントリ一覧</a>
+    <a href="{{ url_for('users.index') }}">ユーザ一覧</a>
+    <a href="{{ url_for('auth.logout') }}">ログアウト</a>
+  {% else %}
+    <a href="{{ url_for('auth.login') }}">ログイン</a>
+    <a href="{{ url_for('users.create') }}">ユーザ新規登録</a>
+  {% endif %}
+
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

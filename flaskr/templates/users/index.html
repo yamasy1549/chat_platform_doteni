@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>ユーザ一覧</h2>
+
+  <ul>
+  {% for user in users %}
+  <li><a href="{{ url_for('users.edit', user_id=user.id) }}">{{ user.name }}</a></li>
+  {% else %}
+  <li><em>ユーザが存在しません。</em></li>
+  {% endfor %}
+  </ul>
+
+  <a href="{{ url_for('users.create') }}">ユーザ新規登録</a>
+{% endblock body %}

@@ -2,50 +2,21 @@ import os
 import tempfile
 
 import pytest
-from flaskr import create_app
-from flaskr.db import get_db, init_db
+from flaskr.factory import create_app
+from flaskr.core import db
 
-with open(os.path.join(os.path.dirname(__file__), "data.sql"), "rb") as f:
-    _data_sql = f.read().decode("utf8")
-
-
-@pytest.fixture
-def app():
-    db_fd, db_path = tempfile.mkstemp()
-
-    app = create_app({
-        "TESTING": True,
-        "DATABASE": db_path,
-    })
-
-    with app.app_context():
-        init_db()
-        get_db().executescript(_data_sql)
-
-    yield app
-
-    os.close(db_fd)
-    os.unlink(db_path)
-
-
-@pytest.fixture
-def client(app):
-    return app.test_client()
-
-
-@pytest.fixture
-def runner(app):
-    return app.test_cli_runner()
+from tests.db.seeds.entry import entries
+from tests.db.seeds.user import users
 
 
 class AuthActions(object):
     def __init__(self, client):
         self._client = client
 
-    def login(self, username="test", password="test"):
+    def login(self, email="test1", password="test1"):
         return self._client.post(
             "/auth/login",
-            data={"username": username, "password": password}
+            data={"email": email, "password": password}
         )
 
     def logout(self):
@@ -53,5 +24,39 @@ class AuthActions(object):
 
 
 @pytest.fixture
+def app():
+    db_fd, db_path = tempfile.mkstemp()
+
+    app = create_app({
+        "DEBUG": False,
+        "TESTING": True,
+        "SECRET_KEY": "secret key",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+        "SQLALCHEMY_POOL_SIZE": None,
+        "SQLALCHEMY_POOL_TIMEOUT": None,
+        "SQLALCHEMY_POOL_RECYCLE": None,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+    })
+
+    with app.app_context():
+        db.create_all()
+        db.session.bulk_save_objects(entries)
+        db.session.bulk_save_objects(users)
+        db.session.commit()
+
+    yield app
+
+    os.close(db_fd)
+    os.unlink(db_path)
+
+@pytest.fixture
+def client(app):
+    return app.test_client()
+
+@pytest.fixture
 def auth(client):
     return AuthActions(client)
+
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
