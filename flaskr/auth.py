@@ -1,16 +1,23 @@
 import functools
-
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-
 from flaskr.db import get_db
+
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+
 @bp.route("/register", methods=("GET", "POST"))
 def register():
+    """
+    [GET] /auth/register
+    [POST] /auth/register
+
+    username, password を受け取ってユーザ新規登録をする
+    """
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -18,9 +25,9 @@ def register():
         error = None
 
         if not username:
-            error = "Username is required."
+            error = "ユーザ名が必須です。"
         elif not password:
-            error = "Password is required."
+            error = "パスワードが必須です。"
 
         if error is None:
             try:
@@ -30,7 +37,7 @@ def register():
                 )
                 db.commit()
             except db.IntegrityError:
-                error = f"User {username} is already registered."
+                error = f"ユーザ「{username}」はすでに登録されています。"
             else:
                 return redirect(url_for("auth.login"))
 
@@ -40,6 +47,14 @@ def register():
 
 @bp.route("/login", methods=("GET", "POST"))
 def login():
+    """
+    [GET] /auth/login
+    [POST] /auth/login
+
+    username, password を受け取ってログインする
+    session["user_id"] にユーザIDを保持しておく
+    """
+
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
@@ -50,9 +65,9 @@ def login():
         ).fetchone()
 
         if user is None:
-            error = "Incorrect username."
+            error = "ユーザ名が違います。"
         elif not check_password_hash(user["password"], password):
-            error = "Incorrect password."
+            error = "パスワードが違います。"
 
         if error is None:
             session.clear()
@@ -62,6 +77,18 @@ def login():
         flash(error)
 
     return render_template("auth/login.html")
+
+@bp.route("/logout")
+def logout():
+    """
+    [GET] /auth/logout
+
+    ログアウトする
+    sessionを空にする
+    """
+
+    session.clear()
+    return redirect(url_for("index"))
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -74,12 +101,12 @@ def load_logged_in_user():
             "SELECT * FROM user WHERE id = ?", (user_id,)
         ).fetchone()
 
-@bp.route("/logout")
-def logout():
-    session.clear()
-    return redirect(url_for("index"))
-
 def login_required(view):
+    """
+    このannotationがついた処理はログインが必須になる
+    ログインしていなければ /auth/login へ、ログインしていればリクエスト先のページへ遷移する
+    """
+
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:

@@ -1,8 +1,5 @@
-# https://flask.palletsprojects.com/en/2.0.x/tutorial/factory/#the-application-factory
-
-
 import os
-from flask import Flask
+from flask import Flask, redirect
 
 
 def create_app(test_config=None):
@@ -22,6 +19,12 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    @app.route("/")
+    def index():
+        return redirect("/blog")
+
+    app.add_url_rule("/", endpoint="index")
+
     from . import db
     db.init_app(app)
 
@@ -30,6 +33,5 @@ def create_app(test_config=None):
 
     from . import blog
     app.register_blueprint(blog.bp)
-    app.add_url_rule("/", endpoint="index")
 
     return app
