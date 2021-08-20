@@ -1,6 +1,6 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, session
 from flaskr.core import db
-from flaskr.models import User
+from flaskr.models.user import ValidationError, User
 from flaskr.views import login_required
 
 
@@ -51,31 +51,19 @@ def create():
     """
 
     if request.method == "POST":
-        if request.form["name"] is "":
-            flash("名前を入力してください。")
-            return redirect(url_for("users.create"))
-
-        if request.form["email"] is "":
-            flash("メールアドレスを入力してください。")
-            return redirect(url_for("users.create"))
-
-        if request.form["password"] is "":
-            flash("パスワードを入力してください。")
-            return redirect(url_for("users.create"))
-
-        if len(request.form["password"]) < 1:
-            flash("パスワードは1文字以上にしてください。")
-            return redirect(url_for("users.create"))
-
         try:
             user = User(name=request.form["name"],
                         email=request.form["email"],
                         password=request.form["password"])
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for("auth.login"))
-        except:
-            flash("メールアドレスはすでに登録されています。")
+
+            if session.get("user_id"):
+                return redirect(url_for("users.index"))
+
+            return redirect(url_for("index.root"))
+        except ValidationError as error:
+            flash(error.args[0])
             return redirect(url_for("users.create"))
     return render_template("users/edit.html")
 

@@ -1,6 +1,6 @@
 from functools import wraps
 from flask import session, g, redirect, url_for, request
-from flaskr.models import User
+from flaskr.models.user import User
 
 
 def login_required(f):

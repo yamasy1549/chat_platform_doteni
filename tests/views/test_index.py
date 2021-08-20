@@ -1,5 +1,4 @@
 import pytest
-from flaskr.models import Entry
 
 
 def test_root(client, auth, app):

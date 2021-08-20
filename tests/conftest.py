@@ -4,6 +4,8 @@ import tempfile
 import pytest
 from flaskr.factory import create_app
 from flaskr.core import db
+from flaskr.models.entry import Entry
+from flaskr.models.user import User
 
 from tests.db.seeds.entry import entries
 from tests.db.seeds.user import users
@@ -40,8 +42,8 @@ def app():
 
     with app.app_context():
         db.create_all()
-        db.session.bulk_save_objects(entries)
-        db.session.bulk_save_objects(users)
+        db.session.bulk_save_objects([Entry(title=d[0], text=d[1]) for d in entries])
+        db.session.bulk_save_objects([User(name=d[0], email=d[1], password=d[2]) for d in users])
         db.session.commit()
 
     yield app

@@ -1,5 +1,5 @@
 import pytest
-from flaskr.models import User
+from flaskr.models.user import User
 
 
 def test_index(client, auth, app):
@@ -31,14 +31,23 @@ def test_create(client, auth, app):
     response = client.get("/users/create")
     assert 200 == response.status_code
 
-    # [POST]
+    # [POST] ログイン前
     response = client.post(
             "/users/create",
-            data={"name": "a", "email": "a", "password": "a"}
+            data={"name": "aaaaa", "email": "aaaaa", "password": "aaaaa"}
             )
-    assert "http://localhost/auth/login" == response.headers["Location"]
+    assert "http://localhost/" == response.headers["Location"]
+
+    # [POST] ログイン後
+    auth.login()
+    response = client.post(
+            "/users/create",
+            data={"name": "bbbbb", "email": "bbbbb", "password": "bbbbb"}
+            )
+    assert "http://localhost/users/" == response.headers["Location"]
+
     with app.app_context():
-        user_list = User.query.filter(User.name=="a").all()
+        user_list = User.query.filter(User.name=="aaaaa").all()
         assert len(user_list) is not 0
 
 def test_delete(client, auth, app):
@@ -52,10 +61,10 @@ def test_delete(client, auth, app):
         assert user is None
 
 @pytest.mark.parametrize(("name", "email", "password", "message"), (
-    ("", "", "", "名前を入力してください。".encode()),
-    ("a", "", "", "メールアドレスを入力してください。".encode()),
-    ("a", "test1", "", "パスワードを入力してください。".encode()),
-    ("a", "test1", "a", "メールアドレスはすでに登録されています。".encode()),
+    ("", "", "", "ユーザ名は必須です。".encode()),
+    ("ccccc", "", "", "メールアドレスは必須です。".encode()),
+    ("ccccc", "ccccc", "c", "パスワードは3文字以上にしてください。".encode()),
+    ("ccccc", "test1", "ccccc", "メールアドレスはすでに登録されています。".encode()),
 ))
 def test_register_validate_input(client, name, email, password, message):
     response = client.post(
@@ -63,5 +72,4 @@ def test_register_validate_input(client, name, email, password, message):
         data={"name": name, "email": email, "password": password},
         follow_redirects=True
     )
-    print(response.data.decode())
     assert message in response.data
