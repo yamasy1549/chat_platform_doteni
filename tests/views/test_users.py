@@ -19,7 +19,7 @@ def test_edit(client, auth, app):
     # [POST]
     response = client.post(
             "/users/2/edit",
-            data={"name": "updated", "email": "updated", "password": "updated"},
+            data={"name": "updated", "password": "updated"},
             follow_redirects=True)
     assert 200 == response.status_code
     with app.app_context():
@@ -34,7 +34,7 @@ def test_create(client, auth, app):
     # [POST] ログイン前
     response = client.post(
             "/users/create",
-            data={"name": "aaaaa", "email": "aaaaa", "password": "aaaaa"}
+            data={"name": "aaaaa", "password": "aaaaa"}
             )
     assert "http://localhost/" == response.headers["Location"]
 
@@ -42,7 +42,7 @@ def test_create(client, auth, app):
     auth.login()
     response = client.post(
             "/users/create",
-            data={"name": "bbbbb", "email": "bbbbb", "password": "bbbbb"}
+            data={"name": "bbbbb", "password": "bbbbb"}
             )
     assert "http://localhost/users/" == response.headers["Location"]
 
@@ -60,16 +60,15 @@ def test_delete(client, auth, app):
         user = User.query.get(2)
         assert user is None
 
-@pytest.mark.parametrize(("name", "email", "password", "message"), (
-    ("", "", "", "ユーザ名は必須です。".encode()),
-    ("ccccc", "", "", "メールアドレスは必須です。".encode()),
-    ("ccccc", "ccccc", "c", "パスワードは3文字以上にしてください。".encode()),
-    ("ccccc", "test1", "ccccc", "メールアドレスはすでに登録されています。".encode()),
+@pytest.mark.parametrize(("name", "password", "message"), (
+    ("", "", "ユーザ名は必須です。".encode()),
+    ("test1", "ccccc", "ユーザ名はすでに登録されています。".encode()),
+    ("ccccc", "c", "パスワードは3文字以上にしてください。".encode()),
 ))
-def test_register_validate_input(client, name, email, password, message):
+def test_register_validate_input(client, name, password, message):
     response = client.post(
         "/users/create",
-        data={"name": name, "email": email, "password": password},
+        data={"name": name, "password": password},
         follow_redirects=True
     )
     assert message in response.data

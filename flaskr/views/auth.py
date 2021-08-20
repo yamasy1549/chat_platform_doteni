@@ -16,14 +16,14 @@ def login():
     """
 
     if request.method == "POST":
-        user, authenticated = User.authenticate(db.session.query, request.form["email"], request.form["password"])
+        user, authenticated = User.authenticate(db.session.query, request.form["name"], request.form["password"])
         if authenticated:
             session["user_id"] = user.id
             flash("ログインしました")
             current_app.logger.info(f"[/auth/login] {user}")
             return redirect(url_for("index.root"))
         else:
-            flash("メールアドレスかパスワードが違います。")
+            flash("ユーザ名かパスワードが違います。")
     return render_template("auth/login.html")
 
 @bp.route("/logout")

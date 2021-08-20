@@ -34,7 +34,6 @@ def edit(user_id):
         abort(404)
     if request.method == "POST":
         user.name = request.form["name"]
-        user.email = request.form["email"]
         user.password = request.form["password"]
         db.session.add(user)
         db.session.commit()
@@ -53,7 +52,6 @@ def create():
     if request.method == "POST":
         try:
             user = User(name=request.form["name"],
-                        email=request.form["email"],
                         password=request.form["password"])
             db.session.add(user)
             db.session.commit()

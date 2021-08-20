@@ -12,12 +12,12 @@ def test_login(client, auth, app):
         client.get("/")
         assert session["user_id"] == 1
 
-@pytest.mark.parametrize(("email", "password", "message"), (
-    ("a", "test", "メールアドレスかパスワードが違います。".encode()),
-    ("test", "a", "メールアドレスかパスワードが違います。".encode()),
+@pytest.mark.parametrize(("name", "password", "message"), (
+    ("a", "test", "ユーザ名かパスワードが違います。".encode()),
+    ("test", "a", "ユーザ名かパスワードが違います。".encode()),
 ))
-def test_login_validate_input(auth, email, password, message):
-    response = auth.login(email, password)
+def test_login_validate_input(auth, name, password, message):
+    response = auth.login(name, password)
     assert message in response.data
 
 def test_logout(client, auth, app):

@@ -1,13 +1,13 @@
 {% extends "layout.html" %}
 {% block body %}
   <h2>ログイン</h2>
-  <form action="{{ url_for('auth.login') }}" method=post>
+  <form action="{{ url_for('auth.login') }}" method="post">
     <dl>
-      <dt>メールアドレス:
-      <dd><input type=text name=email>
-      <dt>パスワード:
-      <dd><input type=password name=password>
-      <dd><input type=submit value="ログイン">
+      <dt>ユーザ名</dt>
+      <dd><input type="text" name="name" /></dd>
+      <dt>パスワード</dt>
+      <dd><input type="password" name="password" /></dd>
+      <dd><input type=2submit" value="ログイン"></dd>
     </dl>
   </form>
 {% endblock %}

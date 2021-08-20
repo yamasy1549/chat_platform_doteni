@@ -7,9 +7,8 @@ from flaskr.models import ValidationError
 class User(db.Model):
     __tablename__ = "users"
 
-    id        = db.Column("id", db.Integer, primary_key=True)
+    id        = db.Column("id",       db.Integer,     primary_key=True)
     name      = db.Column("name",     db.String(100), nullable=False, unique=True)
-    email     = db.Column("email",    db.String(100), nullable=False, unique=True)
     _password = db.Column("password", db.String(100), nullable=False)
 
     def _get_password(self):
@@ -43,19 +42,6 @@ class User(db.Model):
 
         return name
 
-    @validates("email")
-    def validate_email(self, key, email):
-        if not email:
-            raise ValidationError("メールアドレスは必須です。")
-
-        if User.query.filter(User.email == email).first():
-            raise ValidationError("メールアドレスはすでに登録されています。")
-
-        if len(email) < 3:
-            raise ValidationError("メールアドレスは3文字以上にしてください。")
-
-        return email
-
     @validates("password")
     def validate_password(self, key, password):
         if not password:
@@ -67,12 +53,11 @@ class User(db.Model):
         return password
 
     @classmethod
-    def authenticate(cls, query, email, password):
-        user = query(cls).filter(cls.email==email).first()
+    def authenticate(cls, query, name, password):
+        user = query(cls).filter(cls.name==name).first()
         if user is None:
             return None, False
         return user, user.check_password(password)
 
     def __repr__(self):
-        return u"<User id={self.id} name={self.name!r} email={self.email!r}>".format(self=self)
-
+        return u"<User id={self.id} name={self.name!r}>".format(self=self)
