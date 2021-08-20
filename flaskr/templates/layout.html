@@ -7,6 +7,7 @@
     <a href="{{ url_for('entries.index') }}">エントリ一覧</a>
     {% if g.user.is_admin() %}
       <a href="{{ url_for('users.index') }}">ユーザ一覧</a>
+      <a href="{{ url_for('scenarios.index') }}">シナリオ一覧</a>
     {% endif %}
     <a href="{{ url_for('auth.logout') }}">ログアウト</a>
   {% else %}

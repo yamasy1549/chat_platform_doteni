@@ -31,8 +31,9 @@ def load_user():
 def init_app(app):
     app.before_request(load_user)
 
-    from flaskr.views import index, auth, entries, users
+    from flaskr.views import index, auth, entries, users, scenarios
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp)
     app.register_blueprint(entries.bp)
     app.register_blueprint(users.bp)
+    app.register_blueprint(scenarios.bp)
