@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flaskr.core import db
 from flaskr.models.entry import Entry
-from flaskr.views import login_required
+from flaskr.views import login_required, admin_required
 
 
 bp = Blueprint("entries", __name__, url_prefix="/entries")
@@ -20,7 +20,7 @@ def index():
     return render_template("entries/index.html", entries=entries)
 
 @bp.route("/<int:entry_id>/edit", methods=["GET", "POST"])
-@login_required
+@admin_required
 def edit(entry_id):
     """
     [GET] /entries/:entry_id/edit
@@ -41,7 +41,7 @@ def edit(entry_id):
     return render_template("entries/edit.html", entry=entry)
 
 @bp.route("/create", methods=["GET", "POST"])
-@login_required
+@admin_required
 def create():
     """
     [GET] /entries/create
@@ -63,7 +63,7 @@ def create():
     return render_template("entries/edit.html")
 
 @bp.route("/<int:entry_id>/delete", methods=["POST"])
-@login_required
+@admin_required
 def delete(entry_id):
     """
     [POST] /entries/:entry_id/delete

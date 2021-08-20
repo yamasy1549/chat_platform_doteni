@@ -13,7 +13,7 @@ def init_db_with_seeds():
     with app.app_context():
         db.create_all()
         db.session.bulk_save_objects([Entry(title=d[0], text=d[1]) for d in entries])
-        db.session.bulk_save_objects([User(name=d[0], password=d[1]) for d in users])
+        db.session.bulk_save_objects([User(name=d[0], role=d[1], password=d[2]) for d in users])
         db.session.commit()
 
     print("データベースを初期化しました。")

@@ -5,7 +5,9 @@
   <h1>対話プラットフォーム</h1>
   {% if session.user_id %}
     <a href="{{ url_for('entries.index') }}">エントリ一覧</a>
-    <a href="{{ url_for('users.index') }}">ユーザ一覧</a>
+    {% if g.user.is_admin() %}
+      <a href="{{ url_for('users.index') }}">ユーザ一覧</a>
+    {% endif %}
     <a href="{{ url_for('auth.logout') }}">ログアウト</a>
   {% else %}
     <a href="{{ url_for('auth.login') }}">ログイン</a>

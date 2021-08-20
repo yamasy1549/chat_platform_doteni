@@ -1,7 +1,13 @@
+import enum
 from sqlalchemy.orm import synonym, validates
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.core import db
 from flaskr.models import ValidationError
+
+
+class Role(enum.Enum):
+    ADMIN = 1
+    NORMAL = 2
 
 
 class User(db.Model):
@@ -9,6 +15,7 @@ class User(db.Model):
 
     id        = db.Column("id",       db.Integer,     primary_key=True)
     name      = db.Column("name",     db.String(100), nullable=False, unique=True)
+    role      = db.Column("role",     db.Enum(Role),  nullable=False,              default=Role.NORMAL.name)
     _password = db.Column("password", db.String(100), nullable=False)
 
     def _get_password(self):
@@ -23,34 +30,41 @@ class User(db.Model):
     password_descriptor = property(_get_password, _set_password)
     password = synonym("_password", descriptor=password_descriptor)
 
-    def check_password(self, password):
-        password = password.strip()
-        if not password:
-            return False
-        return check_password_hash(self.password, password)
-
     @validates("name")
-    def validate_name(self, key, name):
-        if not name:
+    def validate_name(self, key, value):
+        if not value:
             raise ValidationError("ユーザ名は必須です。")
 
-        if User.query.filter(User.name == name).first():
+        if User.query.filter(User.name == value).first():
             raise ValidationError("ユーザ名はすでに登録されています。")
 
-        if len(name) < 3:
+        if len(value) < 3:
             raise ValidationError("ユーザ名は3文字以上にしてください。")
 
-        return name
+        return value
 
     @validates("password")
-    def validate_password(self, key, password):
-        if not password:
+    def validate_password(self, key, value):
+        if not value:
             raise ValidationError("パスワードは必須です。")
 
-        if len(password) < 3:
+        if len(value) < 3:
             raise ValidationError("パスワードは3文字以上にしてください。")
 
-        return password
+        return value
+
+    @validates("role")
+    def validate_role(self, key, value):
+        if not value:
+            value = Role.NORMAL.value
+
+        try:
+            value = int(value)
+            value = Role(value)
+        except ValueError:
+            raise ValidationError("ロールの値を正しく指定してください。")
+
+        return value.name
 
     @classmethod
     def authenticate(cls, query, name, password):
@@ -58,6 +72,15 @@ class User(db.Model):
         if user is None:
             return None, False
         return user, user.check_password(password)
+
+    def check_password(self, password):
+        password = password.strip()
+        if not password:
+            return False
+        return check_password_hash(self.password, password)
+
+    def is_admin(self):
+        return self.role == Role.ADMIN
 
     def __repr__(self):
         return u"<User id={self.id} name={self.name!r}>".format(self=self)

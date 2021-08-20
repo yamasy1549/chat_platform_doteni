@@ -1,14 +1,14 @@
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, session
 from flaskr.core import db
 from flaskr.models.user import ValidationError, User
-from flaskr.views import login_required
+from flaskr.views import admin_required
 
 
 bp = Blueprint("users", __name__, url_prefix="/users")
 
 
 @bp.route("/")
-@login_required
+@admin_required
 def index():
     """
     [GET] /users
@@ -20,7 +20,7 @@ def index():
     return render_template("users/index.html", users=users)
 
 @bp.route("/<int:user_id>/edit", methods=["GET", "POST"])
-@login_required
+@admin_required
 def edit(user_id):
     """
     [GET] /users/:user_id/edit
@@ -51,7 +51,12 @@ def create():
 
     if request.method == "POST":
         try:
-            user = User(name=request.form["name"],
+            if "role" in request.form:
+                user = User(name=request.form["name"],
+                        role=request.form["role"],
+                        password=request.form["password"])
+            else:
+                user = User(name=request.form["name"],
                         password=request.form["password"])
             db.session.add(user)
             db.session.commit()
@@ -66,7 +71,7 @@ def create():
     return render_template("users/edit.html")
 
 @bp.route("/<int:user_id>/delete", methods=["POST"])
-@login_required
+@admin_required
 def delete(user_id):
     """
     [POST] /users/:user_id/delete

@@ -60,15 +60,17 @@ def test_delete(client, auth, app):
         user = User.query.get(2)
         assert user is None
 
-@pytest.mark.parametrize(("name", "password", "message"), (
-    ("", "", "ユーザ名は必須です。".encode()),
-    ("test1", "ccccc", "ユーザ名はすでに登録されています。".encode()),
-    ("ccccc", "c", "パスワードは3文字以上にしてください。".encode()),
+@pytest.mark.parametrize(("name", "role", "password", "message"), (
+    ("", 1, "", "ユーザ名は必須です。".encode()),
+    ("test1", 1, "ccccc", "ユーザ名はすでに登録されています。".encode()),
+    ("ccccc", 1, "c", "パスワードは3文字以上にしてください。".encode()),
+    ("ccccc", 10000, "ccccc", "ロールの値を正しく指定してください。".encode()),
 ))
-def test_register_validate_input(client, name, password, message):
+def test_register_validate_input(client, name, role, password, message):
     response = client.post(
         "/users/create",
-        data={"name": name, "password": password},
+        data={"name": name, "role": role, "password": password},
         follow_redirects=True
     )
+    print(response.data.decode())
     assert message in response.data

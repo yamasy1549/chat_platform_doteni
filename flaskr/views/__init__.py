@@ -11,6 +11,16 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_view
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_view(*args, **kwargs):
+        if g.user is None:
+            return redirect(url_for("auth.login", next=request.path))
+        if not g.user.is_admin():
+            return redirect(url_for("index.root"))
+        return f(*args, **kwargs)
+    return decorated_view
+
 def load_user():
     user_id = session.get("user_id")
     if user_id is None:
