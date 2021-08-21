@@ -13,21 +13,19 @@
 
     <div class="message_area">
       <h3>メッセージ</h3>
-      {% if room.messages %}
-        <ol>
-          {% for message in room.messages %}
-            <li>
-              <div class="message">
-                {{ message.user.name }}: {{ message.text }}
-              </div>
-            </li>
-          {% endfor %}
-        </ol>
-      {% endif %}
+      <ol id="messageList">
+        {% for message in room.messages %}
+          <li>
+            <div class="message">
+              {{ message.user.name }}: {{ message.text }}
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
 
-      <form action="" method="post">
+      <form action="" method="" id="form">
         <div class="form_horizontal">
-          <textarea type="text" id="text"/></textarea>
+          <textarea type="text" id="text" name="text" /></textarea>
         </div>
 
         <div class="form_horizontal">
@@ -36,4 +34,43 @@
       </form>
     </div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
+    const form = document.getElementById("form");
+    const textarea = document.getElementById("text");
+    const messageList = document.getElementById("messageList");
+
+    const hash_id = location.pathname.split("/").pop()
+
+    const socket = io();
+
+    socket.on("connect", function() {
+      socket.emit("join", {
+        hash_id: hash_id,
+      })
+
+      socket.on("room_message", function(payload) {
+        const name = payload.name
+        const message = payload.text
+        const li = document.createElement("li")
+        const div = document.createElement("div")
+        const content = document.createTextNode(`${name}: ${message}`);
+        div.appendChild(content)
+        li.appendChild(div)
+        div.classList.add("message")
+        messageList.appendChild(li)
+      });
+    });
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      const payload = {
+        hash_id: hash_id,
+        text: textarea.value,
+      };
+      socket.emit("create_message", payload);
+      textarea.value = "";
+    });
+  </script>
 {% endblock %}

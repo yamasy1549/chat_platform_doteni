@@ -1,6 +1,8 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort, g
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort, g, session
+from flask_socketio import emit, join_room, leave_room
+from flaskr.factory import socketio
 from flaskr.core import db
-from flaskr.models import Room, Scenario, Status
+from flaskr.models import Room, Scenario, Status, Message, User
 from flaskr.models.error import ValidationError
 from flaskr.views import login_required, admin_required
 
@@ -20,6 +22,29 @@ def get_scenarios():
         return None
     return scenario_list
 
+@socketio.on("join")
+def on_join(payload):
+    hash_id = payload["hash_id"]
+    join_room(hash_id)
+
+@socketio.on("create_message")
+def on_create_message(payload):
+    hash_id = payload["hash_id"]
+    text = payload["text"]
+
+    user_id = int(session["user_id"])
+    room = get_room_from_hash_id(hash_id)
+    message = Message(
+            text=text,
+            user_id=user_id,
+            room_id=room.id,
+            )
+    db.session.add(message)
+    db.session.commit()
+
+    user = User.query.get(user_id)
+    emit("room_message", {"name": user.name, "text": text}, room=hash_id)
+    #  emit("room_message", {"name": user.name, "text": text}, broadcast=True)
 
 @bp.route("/")
 @login_required
@@ -49,6 +74,7 @@ def show(hash_id):
     room = get_room_from_hash_id(hash_id)
     if room is None:
         abort(404)
+
     return render_template("rooms/show.html", room=room)
 
 @bp.route("/<string:hash_id>/edit", methods=["GET", "POST"])
