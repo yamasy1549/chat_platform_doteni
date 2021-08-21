@@ -3,6 +3,7 @@ from sqlalchemy.orm import synonym, validates
 from hashlib import sha256
 from flaskr.core import db
 from flaskr.models.error import ValidationError
+from flaskr.models.room_scenario import room_scenarios
 
 
 class Status(enum.Enum):
@@ -15,8 +16,9 @@ class Status(enum.Enum):
 class Room(db.Model):
     __tablename__ = "rooms"
 
-    id     = db.Column("id",     db.Integer,    primary_key=True)
+    id     = db.Column("id",     db.Integer,      primary_key=True)
     status = db.Column("status", db.Enum(Status), nullable=False,   default=Status.UNAVAILABLE.name)
+    scenarios = db.relationship("Scenario", secondary=room_scenarios, lazy="subquery", backref=db.backref("rooms", lazy=True))
 
     @property
     def hash(self):

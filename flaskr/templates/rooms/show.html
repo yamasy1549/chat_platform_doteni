@@ -1,7 +1,15 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  {% if room %}
-    {{ room.hash }}
+  <h2>ルーム</h2>
+  {% if room.scenarios %}
+    <ul>
+      {% for scenario in room.scenarios %}
+        <li>
+          <h3>{{ scenario.title }}</h3>
+          <pre>{{ scenario.text }}</pre>
+        </li>
+      {% endfor %}
+    </ul>
   {% endif %}
 {% endblock %}
