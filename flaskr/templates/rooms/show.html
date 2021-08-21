@@ -2,12 +2,25 @@
 
 {% block body %}
   <h2>ルーム</h2>
+
   {% if room.scenarios %}
+    <h3>シナリオ</h3>
     <ul>
       {% for scenario in room.scenarios %}
         <li>
-          <h3>{{ scenario.title }}</h3>
+          <h4>{{ scenario.title }}</h4>
           <pre>{{ scenario.text }}</pre>
+        </li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if room.messages %}
+    <h3>メッセージ</h3>
+    <ul>
+      {% for message in room.messages %}
+        <li>
+          <pre>{{ message.text }} ({{ message.user.name }})</pre>
         </li>
       {% endfor %}
     </ul>

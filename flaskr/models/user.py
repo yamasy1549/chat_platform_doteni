@@ -17,6 +17,7 @@ class User(db.Model):
     name      = db.Column("name",     db.String(100), nullable=False, unique=True)
     role      = db.Column("role",     db.Enum(Role),  nullable=False,              default=Role.NORMAL.name)
     _password = db.Column("password", db.String(100), nullable=False)
+    messages  = db.relationship("Message", backref="user", lazy=True)
 
     def _get_password(self):
         return self._password

@@ -19,6 +19,7 @@ class Room(db.Model):
     id     = db.Column("id",     db.Integer,      primary_key=True)
     status = db.Column("status", db.Enum(Status), nullable=False,   default=Status.UNAVAILABLE.name)
     scenarios = db.relationship("Scenario", secondary=room_scenarios, lazy="subquery", backref=db.backref("rooms", lazy=True))
+    messages  = db.relationship("Message", backref="rooms", lazy=True)
 
     @property
     def hash(self):
