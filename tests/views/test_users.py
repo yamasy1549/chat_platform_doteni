@@ -47,7 +47,7 @@ def test_create(client, auth, app):
     assert "http://localhost/users/" == response.headers["Location"]
 
     with app.app_context():
-        user_list = User.query.filter(User.name=="aaaaa").all()
+        user_list = User.query.filter_by(name="aaaaa").all()
         assert len(user_list) is not 0
 
 def test_delete(client, auth, app):

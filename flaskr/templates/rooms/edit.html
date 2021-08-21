@@ -17,7 +17,7 @@
     </dl>
   </form>
   {% if room %}
-    <form action={{ url_for('rooms.delete', room_id=room.id) }} method="post">
+    <form action={{ url_for('rooms.delete', hash_id=room.hash_id) }} method="post">
       <input type="hidden" name="_method" value="delete">
       <input type=submit value="削除" onclick="return confirm('本当に削除しますか？')">
     </form>

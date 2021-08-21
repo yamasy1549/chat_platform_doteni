@@ -39,7 +39,7 @@ def test_create(client, auth, app):
             )
     assert "http://localhost/scenarios/" == response.headers["Location"]
     with app.app_context():
-        scenario_list = Scenario.query.filter(Scenario.title=="a").all()
+        scenario_list = Scenario.query.filter_by(title="a").all()
         assert len(scenario_list) is not 0
 
 def test_delete(client, auth, app):

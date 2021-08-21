@@ -1,9 +1,13 @@
 import enum
-from sqlalchemy.orm import synonym, validates
-from hashlib import sha256
+import uuid
+from sqlalchemy.orm import validates
 from flaskr.core import db
 from flaskr.models.error import ValidationError
 from flaskr.models.room_scenario import room_scenarios
+
+
+def generate_hash_id():
+    return uuid.uuid4().hex
 
 
 class Status(enum.Enum):
@@ -16,17 +20,11 @@ class Status(enum.Enum):
 class Room(db.Model):
     __tablename__ = "rooms"
 
-    id     = db.Column("id",     db.Integer,      primary_key=True)
-    status = db.Column("status", db.Enum(Status), nullable=False,   default=Status.UNAVAILABLE.name)
+    id      = db.Column("id",      db.Integer,      primary_key=True)
+    hash_id = db.Column("hash_id", db.String(100),  nullable=False,   default=generate_hash_id)
+    status  = db.Column("status",  db.Enum(Status), nullable=False,   default=Status.UNAVAILABLE.name)
     scenarios = db.relationship("Scenario", secondary=room_scenarios, lazy="subquery", backref=db.backref("rooms", lazy=True))
     messages  = db.relationship("Message", backref="rooms", lazy=True)
-
-    @property
-    def hash(self):
-        value = str(self.id).encode()
-        return sha256(value).hexdigest()
-
-    hash = synonym("id", descriptor=hash)
 
     @validates("status")
     def validate_status(self, key, value):

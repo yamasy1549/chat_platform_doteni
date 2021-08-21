@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort
 from flaskr.core import db
 from flaskr.models import Room
 from flaskr.models.error import ValidationError
@@ -6,6 +6,13 @@ from flaskr.views import login_required, admin_required
 
 
 bp = Blueprint("rooms", __name__, url_prefix="/rooms")
+
+
+def get_room_from_hash_id(hash_id):
+    room_list = Room.query.filter_by(hash_id=hash_id).all()
+    if len(room_list) == 0:
+        return None
+    return room_list[0]
 
 
 @bp.route("/")
@@ -20,32 +27,32 @@ def index():
     rooms = Room.query.order_by(Room.id.desc()).all()
     return render_template("rooms/index.html", rooms=rooms)
 
-@bp.route("/<int:room_id>", methods=["GET"])
+@bp.route("/<string:hash_id>", methods=["GET"])
 @login_required
-def show(room_id):
+def show(hash_id):
     """
-    [GET] /rooms/:room_id
-    [POST] /rooms/:room_id
+    [GET] /rooms/:hash_id
+    [POST] /rooms/:hash_id
 
     ルームの閲覧
     """
 
-    room = Room.query.get(room_id)
+    room = get_room_from_hash_id(hash_id)
     if room is None:
         abort(404)
     return render_template("rooms/show.html", room=room)
 
-@bp.route("/<int:room_id>/edit", methods=["GET", "POST"])
+@bp.route("/<string:hash_id>/edit", methods=["GET", "POST"])
 @admin_required
-def edit(room_id):
+def edit(hash_id):
     """
-    [GET] /rooms/:room_id/edit
-    [POST] /rooms/:room_id/edit
+    [GET] /rooms/:hash_id/edit
+    [POST] /rooms/:hash_id/edit
 
     ルームの編集
     """
 
-    room = Room.query.get(room_id)
+    room = get_room_from_hash_id(hash_id)
     if room is None:
         abort(404)
     if request.method == "POST":
@@ -83,16 +90,16 @@ def create():
 
     return render_template("rooms/edit.html")
 
-@bp.route("/<int:room_id>/delete", methods=["POST"])
+@bp.route("/<string:hash_id>/delete", methods=["POST"])
 @admin_required
-def delete(room_id):
+def delete(hash_id):
     """
-    [POST] /rooms/:room_id/delete
+    [POST] /rooms/:hash_id/delete
 
     ルームの削除
     """
 
-    room = Room.query.get(room_id)
+    room = get_room_from_hash_id(hash_id)
     if room is None:
         response = jsonify({"status": "Not Found"})
         response.status_code = 404

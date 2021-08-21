@@ -36,7 +36,7 @@ class User(db.Model):
         if not value:
             raise ValidationError("ユーザ名は必須です。")
 
-        if User.query.filter(User.name == value).first():
+        if User.query.filter_by(name=value).first():
             raise ValidationError("ユーザ名はすでに登録されています。")
 
         if len(value) < 3:
