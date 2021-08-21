@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <h2>{{ 'ルーム編集' if room else 'ルーム新規登録'}}</h2>
+  <form action="" method="post">
+    <dl>
+      <dt>ステータス</dt>
+      <dd>
+        <select id="" name="status">
+          <option value="1" {{ 'selected' if room and room.status.value == 1 }}>UNAVAILABLE</option>
+          <option value="2" {{ 'selected' if room and room.status.value == 2 }}>AVAILABLE</option>
+          <option value="3" {{ 'selected' if room and room.status.value == 3 }}>OCCUPIED</option>
+          <option value="4" {{ 'selected' if room and room.status.value == 4 }}>USED</option>
+        </select>
+      </dd>
+      <dd><input type=submit value={{ '保存' if room else '新規登録' }}></dd>
+    </dl>
+  </form>
+  {% if room %}
+    <form action={{ url_for('rooms.delete', room_id=room.id) }} method="post">
+      <input type="hidden" name="_method" value="delete">
+      <input type=submit value="削除" onclick="return confirm('本当に削除しますか？')">
+    </form>
+  {% endif %}
+{% endblock %}

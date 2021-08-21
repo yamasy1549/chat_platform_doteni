@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+  <ul class="rooms">
+  {% for room in rooms %}
+    <li>
+      <h2><a href={{ url_for('rooms.show', room_id=room.id) }}>{{ room.hash }}</a></h2>
+      {{ room.status }}
+      {% if g.user.is_admin() %}
+        <a href="{{ url_for('rooms.edit', room_id=room.id) }}">編集</a>
+      {% endif %}
+    </li>
+  {% else %}
+    <li><em>ルームがありません。</em>
+  {% endfor %}
+  </ul>
+
+  {% if g.user.is_admin() %}
+    <a href="{{ url_for('rooms.create') }}">ルーム新規登録</a>
+  {% endif %}
+{% endblock %}

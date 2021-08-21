@@ -12,4 +12,4 @@ def root():
     ルート
     """
 
-    return redirect(url_for("entries.index"))
+    return redirect(url_for("rooms.index"))

@@ -2,7 +2,8 @@ import pytest
 from urllib.parse import urlencode
 
 @pytest.mark.parametrize(("path", "method"), (
-    ("/entries", "GET"), # TODO: なぜか /entries/ にリダイレクトされている？
+    ("/rooms", "GET"), # TODO: なぜか /rooms/ にリダイレクトされている？
+    ("/rooms/1", "GET")
 ))
 def test_login_required(client, auth, path, method):
     if method == "GET":
@@ -11,9 +12,9 @@ def test_login_required(client, auth, path, method):
     assert "http://localhost/auth/login?{}".format(urlencode({"next": path})) == response.headers["Location"]
 
 @pytest.mark.parametrize(("path", "method"), (
-    ("/entries/2/edit", "GET"),
-    ("/entries/create", "GET"),
-    ("/entries/2/delete", "POST"),
+    ("/rooms/2/edit", "GET"),
+    ("/rooms/create", "GET"),
+    ("/rooms/2/delete", "POST"),
     ("/users", "GET"), # TODO: なぜか /users/ にリダイレクトされている？
     ("/users/2/edit", "GET"),
     ("/users/2/delete", "POST"),

@@ -72,5 +72,4 @@ def test_register_validate_input(client, name, role, password, message):
         data={"name": name, "role": role, "password": password},
         follow_redirects=True
     )
-    print(response.data.decode())
     assert message in response.data
