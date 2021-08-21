@@ -16,7 +16,7 @@ def index():
     シナリオの一覧
     """
 
-    scenarios = Scenario.query.order_by(Scenario.id.desc()).all()
+    scenarios = Scenario.query.all()
     return render_template("scenarios/index.html", scenarios=scenarios)
 
 @bp.route("/<int:scenario_id>/edit", methods=["GET", "POST"])

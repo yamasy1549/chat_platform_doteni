@@ -12,7 +12,7 @@ def test_index(client, auth, app):
     auth.login()
     response = client.get("/rooms", follow_redirects=True)
     assert 200 == response.status_code
-    assert b"Status" in response.data
+    assert "ルーム新規登録".encode() in response.data
 
 def test_show(client, auth, app):
     hash_id = get_hash_id(app, 2)
@@ -23,7 +23,7 @@ def test_show(client, auth, app):
     assert 200 == response.status_code
 
     with app.app_context():
-        assert "ルーム".encode() in response.data
+        assert "メッセージ".encode() in response.data
 
 def test_edit(client, auth, app):
     hash_id = get_hash_id(app, 2)

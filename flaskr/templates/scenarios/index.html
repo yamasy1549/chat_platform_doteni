@@ -1,20 +1,24 @@
 {% extends "layout.html" %}
+
 {% block body %}
-  <ul class=scenarios>
-  {% for scenario in scenarios %}
-    <li>
-      <h2>{{ scenario.title }}</h2>
-      {{ scenario.text }}
-      {% if g.user.is_admin() %}
-        <a href="{{ url_for('scenarios.edit', scenario_id=scenario.id) }}">編集</a>
-      {% endif %}
-    </li>
-  {% else %}
-    <li><em>シナリオがありません。</em>
-  {% endfor %}
-  </ul>
+  <h2>シナリオ一覧</h2>
+
+  <ol class="scenarios">
+    {% for scenario in scenarios %}
+      <li class="scenario">
+        <h3>{{ scenario.title }}</h3>
+        <pre>{{ scenario.text }}</pre>
+
+        {% if g.user.is_admin() %}
+          <a href="{{ url_for('scenarios.edit', scenario_id=scenario.id) }}" class="button">編集</a>
+        {% endif %}
+      </li>
+    {% else %}
+      <li>シナリオがありません。</li>
+    {% endfor %}
+  </ol>
 
   {% if g.user.is_admin() %}
-    <a href="{{ url_for('scenarios.create') }}">シナリオ新規登録</a>
+    <a href="{{ url_for('scenarios.create') }}" class="button">シナリオ新規登録</a>
   {% endif %}
 {% endblock %}

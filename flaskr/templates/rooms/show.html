@@ -1,28 +1,39 @@
-{% extends "layout.html" %}
+{% extends "layout_simple.html" %}
 
 {% block body %}
-  <h2>ルーム</h2>
-
-  {% if room.scenarios %}
-    <h3>シナリオ</h3>
-    <ul>
-      {% for scenario in room.scenarios %}
-        <li>
-          <h4>{{ scenario.title }}</h4>
+  <div class="flex">
+    <div class="scenario_area">
+      <h3>シナリオ</h3>
+      {% if room.scenarios %}
+        {% for scenario in room.scenarios %}
           <pre>{{ scenario.text }}</pre>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
 
-  {% if room.messages %}
-    <h3>メッセージ</h3>
-    <ul>
-      {% for message in room.messages %}
-        <li>
-          <pre>{{ message.text }} ({{ message.user.name }})</pre>
-        </li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+    <div class="message_area">
+      <h3>メッセージ</h3>
+      {% if room.messages %}
+        <ol>
+          {% for message in room.messages %}
+            <li>
+              <div class="message">
+                {{ message.user.name }}: {{ message.text }}
+              </div>
+            </li>
+          {% endfor %}
+        </ol>
+      {% endif %}
+
+      <form action="" method="post">
+        <div class="form_horizontal">
+          <textarea type="text" id="text"/></textarea>
+        </div>
+
+        <div class="form_horizontal">
+          <input type=submit value={{ '送信' }} class="button">
+        </div>
+      </form>
+    </div>
+  </div>
 {% endblock %}

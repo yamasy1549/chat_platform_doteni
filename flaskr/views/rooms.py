@@ -1,6 +1,6 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort, g
 from flaskr.core import db
-from flaskr.models import Room
+from flaskr.models import Room, Scenario, Status
 from flaskr.models.error import ValidationError
 from flaskr.views import login_required, admin_required
 
@@ -14,6 +14,12 @@ def get_room_from_hash_id(hash_id):
         return None
     return room_list[0]
 
+def get_scenarios():
+    scenario_list = Scenario.query.all()
+    if len(scenario_list) == 0:
+        return None
+    return scenario_list
+
 
 @bp.route("/")
 @login_required
@@ -24,7 +30,10 @@ def index():
     ルームの一覧
     """
 
-    rooms = Room.query.order_by(Room.id.desc()).all()
+    if g.user.is_admin():
+        rooms = Room.query.all()
+    else:
+        rooms = Room.query.filter_by(status=Status.AVAILABLE).all()
     return render_template("rooms/index.html", rooms=rooms)
 
 @bp.route("/<string:hash_id>", methods=["GET"])
@@ -53,14 +62,32 @@ def edit(hash_id):
     """
 
     room = get_room_from_hash_id(hash_id)
-    if room is None:
+    scenarios = get_scenarios()
+    if room is None or scenarios is None:
         abort(404)
+
     if request.method == "POST":
-        room.status = request.form["status"]
-        db.session.add(room)
-        db.session.commit()
+        try:
+            if "scenarios" in request.form:
+                room.scenarios = []
+                for scenario_id in request.form.getlist("scenarios"):
+                    scenario_id = int(scenario_id)
+                    scenario = Scenario.query.get(scenario_id)
+                    room.scenarios.append(scenario)
+
+            if "status" in request.form:
+                room.status = request.form["status"]
+
+            db.session.add(room)
+            db.session.commit()
+
+        except ValidationError as error:
+            flash(error.args[0])
+            return redirect(url_for("rooms.edit", hash_id=hash_id))
+
         return redirect(url_for("rooms.index"))
-    return render_template("rooms/edit.html", room=room)
+
+    return render_template("rooms/edit.html", room=room, scenarios=scenarios)
 
 @bp.route("/create", methods=["GET", "POST"])
 @admin_required

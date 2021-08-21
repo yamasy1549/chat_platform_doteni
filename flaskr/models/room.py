@@ -16,6 +16,16 @@ class Status(enum.Enum):
     OCCUPIED = 3
     USED = 4
 
+    def to_text(self):
+        if self == Status.UNAVAILABLE:
+            return "使用不可"
+        if self == Status.AVAILABLE:
+            return "使用可"
+        if self == Status.OCCUPIED:
+            return "使用中"
+        if self == Status.USED:
+            return "使用済み"
+
 
 class Room(db.Model):
     __tablename__ = "rooms"
@@ -41,3 +51,7 @@ class Room(db.Model):
 
     def __repr__(self):
         return "<Room id={id} status={status!r}>".format(id=self.id, status=self.status)
+
+    def capacity(self):
+        scenarios = self.scenarios
+        return len(scenarios)

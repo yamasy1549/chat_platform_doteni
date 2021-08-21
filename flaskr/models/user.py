@@ -9,6 +9,12 @@ class Role(enum.Enum):
     ADMIN = 1
     NORMAL = 2
 
+    def to_text(self):
+        if self == Role.ADMIN:
+            return "管理者"
+        if self == Role.NORMAL:
+            return "利用者"
+
 
 class User(db.Model):
     __tablename__ = "users"
