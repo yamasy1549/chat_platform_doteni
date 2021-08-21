@@ -1,6 +1,7 @@
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, session
 from flaskr.core import db
-from flaskr.models.user import ValidationError, User
+from flaskr.models import User
+from flaskr.models.error import ValidationError
 from flaskr.views import admin_required
 
 

@@ -1,5 +1,6 @@
 from flaskr import app
-from flaskr.db.seeds import init_db_with_seeds
+from flaskr.db import init_db_with_seeds
+
 
 @app.cli.command("init_db")
 def init_db():

@@ -4,9 +4,7 @@ import tempfile
 import pytest
 from flaskr.factory import create_app
 from flaskr.core import db
-from flaskr.models.entry import Entry
-from flaskr.models.user import User
-from flaskr.models.scenario import Scenario
+from flaskr.models import Entry, User, Scenario
 
 from tests.db.seeds.entry import entries
 from tests.db.seeds.user import users

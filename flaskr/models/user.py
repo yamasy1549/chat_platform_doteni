@@ -2,7 +2,7 @@ import enum
 from sqlalchemy.orm import synonym, validates
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.core import db
-from flaskr.models import ValidationError
+from flaskr.models.error import ValidationError
 
 
 class Role(enum.Enum):

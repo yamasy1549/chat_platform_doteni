@@ -1,5 +1,5 @@
 import pytest
-from flaskr.models.scenario import Scenario
+from flaskr.models import Scenario
 
 
 def test_index(client, auth, app):

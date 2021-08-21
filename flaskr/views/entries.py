@@ -1,6 +1,6 @@
 from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request
 from flaskr.core import db
-from flaskr.models.entry import Entry
+from flaskr.models import Entry
 from flaskr.views import login_required, admin_required
 
 

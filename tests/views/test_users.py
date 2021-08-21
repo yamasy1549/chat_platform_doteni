@@ -1,5 +1,5 @@
 import pytest
-from flaskr.models.user import User
+from flaskr.models import User
 
 
 def test_index(client, auth, app):

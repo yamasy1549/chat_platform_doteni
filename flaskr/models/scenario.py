@@ -1,6 +1,6 @@
 from sqlalchemy.orm import validates
 from flaskr.core import db
-from flaskr.models import ValidationError
+from flaskr.models.error import ValidationError
 
 
 class Scenario(db.Model):
