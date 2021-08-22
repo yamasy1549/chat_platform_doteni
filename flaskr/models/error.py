@@ -1,2 +1,2 @@
-class ValidationError(BaseException):
+class ValidationError(Exception):
     pass

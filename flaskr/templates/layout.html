@@ -22,7 +22,7 @@
           <li><a href="{{ url_for('rooms.index') }}">ルーム一覧</a></li>
         {% endif %}
 
-        <li><a href="{{ url_for('auth.logout') }}">{{ g.user.name }} からログアウト</a></li>
+        <li><a href="{{ url_for('auth.logout') }}">{{ g.user.name }}からログアウト</a></li>
       {% else %}
         <li><a href="{{ url_for('auth.login') }}">ログイン</a></li>
         <li><a href="{{ url_for('users.create') }}">ユーザ新規登録</a></li>

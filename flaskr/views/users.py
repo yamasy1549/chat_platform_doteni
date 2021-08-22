@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, session
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, session, url_for
 from flaskr.core import db
 from flaskr.models import User
 from flaskr.models.error import ValidationError
@@ -31,14 +31,20 @@ def edit(user_id):
     """
 
     user = User.query.get(user_id)
+
     if user is None:
         abort(404)
+
     if request.method == "POST":
         user.name = request.form["name"]
         user.password = request.form["password"]
+
         db.session.add(user)
         db.session.commit()
+
+        current_app.logger.info(f"[/users/{user_id}/edit] {user}")
         return redirect(url_for("users.index"))
+
     return render_template("users/edit.html", user=user)
 
 @bp.route("/create", methods=["GET", "POST"])
@@ -59,16 +65,21 @@ def create():
             else:
                 user = User(name=request.form["name"],
                         password=request.form["password"])
+
             db.session.add(user)
             db.session.commit()
 
+            current_app.logger.info(f"[/users/create] {user}")
+
             if session.get("user_id"):
                 return redirect(url_for("users.index"))
+            else:
+                return redirect(url_for("index.root"))
 
-            return redirect(url_for("index.root"))
         except ValidationError as error:
             flash(error.args[0])
             return redirect(url_for("users.create"))
+
     return render_template("users/edit.html")
 
 @bp.route("/<int:user_id>/delete", methods=["POST"])
@@ -81,10 +92,12 @@ def delete(user_id):
     """
 
     user = User.query.get(user_id)
+
     if user is None:
-        response = jsonify({"status": "Not Found"})
-        response.status_code = 404
-        return response
+        abort(404)
+
     db.session.delete(user)
     db.session.commit()
+
+    current_app.logger.info(f"[/users/{user_id}/delete] {user}")
     return redirect(url_for("users.index"))

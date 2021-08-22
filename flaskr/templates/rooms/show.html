@@ -21,13 +21,19 @@
         {% endfor %}
       </ol>
 
+      <div class="form_horizontal">
+        <input type="submit" value="対話開始" onclick="startMessage()" class="button danger">
+        <input type="submit" value="対話終了" onclick="endMessage()" class="button danger">
+        <small>定員 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
+      </div>
+
       <form action="" method="" id="form">
         <div class="form_horizontal">
           <textarea type="text" id="text" name="text" /></textarea>
         </div>
 
         <div class="form_horizontal">
-          <input type=submit value={{ '送信' }} class="button">
+          <input type="submit" value="送信" class="button">
         </div>
       </form>
     </div>
@@ -35,11 +41,12 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   <script type="text/javascript" charset="utf-8">
+    const hash_id = location.pathname.split("/").pop();
+
     const form = document.getElementById("form");
     const textarea = document.getElementById("text");
     const messageList = document.getElementById("messageList");
-
-    const hash_id = location.pathname.split("/").pop()
+    const userList = document.getElementById("userList");
 
     const socket = io();
 
@@ -49,26 +56,40 @@
       });
 
       socket.on("room_message", function(payload) {
-        const name = payload.name
-        const message = payload.text
-        const li = document.createElement("li")
-        const div = document.createElement("div")
-        const content = document.createTextNode(`${name}: ${message}`);
-        div.appendChild(content)
-        li.appendChild(div)
-        div.classList.add("message")
-        messageList.appendChild(li)
+        const li = document.createElement("li");
+        const div = document.createElement("div");
+        const content = document.createTextNode(`${payload.name}: ${payload.text}`);
+
+        div.classList.add("message");
+        div.appendChild(content);
+        li.appendChild(div);
+        messageList.appendChild(li);
+      });
+
+      socket.on("room_user", function(payload) {
+        userList.innerText = payload.users.length;
       });
     });
 
     form.addEventListener("submit", function(event) {
       event.preventDefault();
-      const payload = {
+      socket.emit("create_message", {
         hash_id: hash_id,
         text: textarea.value,
-      };
-      socket.emit("create_message", payload);
+      });
       textarea.value = "";
     });
+
+    function startMessage() {
+      if(confirm("対話を開始しますか？")) {
+        socket.emit("meta_start_message");
+      }
+    }
+
+    function endMessage() {
+      if(confirm("対話を終了しますか？")) {
+        socket.emit("meta_end_message");
+      }
+    }
   </script>
 {% endblock %}

@@ -1,6 +1,5 @@
-from flask import Blueprint, current_app, render_template, redirect, url_for, flash, request, abort, g, session
-from flask_socketio import emit, join_room, leave_room
-from flaskr.factory import socketio
+from sqlalchemy import or_
+from flask import Blueprint, abort, current_app, flash, g, redirect, render_template, request, session, url_for
 from flaskr.core import db
 from flaskr.models import Room, Scenario, Status, Message, User
 from flaskr.models.error import ValidationError
@@ -10,57 +9,36 @@ from flaskr.views import login_required, admin_required
 bp = Blueprint("rooms", __name__, url_prefix="/rooms")
 
 
-def get_room_from_hash_id(hash_id):
+def fetch_user():
+    """
+    Return
+    ------
+    User
+    """
+
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
+    return user
+
+
+def fetch_room_from_hash_id(hash_id):
+    """
+    Paramaters
+    ----------
+    hash_id (str) : ルームのhash_id
+
+    Return
+    ------
+    Room
+    """
+
     room_list = Room.query.filter_by(hash_id=hash_id).all()
+
     if len(room_list) == 0:
         return None
+
     return room_list[0]
-
-def get_scenarios():
-    scenario_list = Scenario.query.all()
-    if len(scenario_list) == 0:
-        return None
-    return scenario_list
-
-@socketio.on("join")
-def on_join(payload):
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-
-    if not user.is_admin():
-        hash_id = payload["hash_id"]
-        session["hash_id"] = hash_id
-        join_room(hash_id)
-        emit("room_message", {"name": user.name, "text": "入室しました"}, room=hash_id)
-
-@socketio.on("disconnect")
-def on_disconnect():
-    user_id = session.get("user_id")
-    user = User.query.get(user_id)
-
-    if not user.is_admin():
-        hash_id = session.get("hash_id")
-        emit("room_message", {"name": user.name, "text": "退室しました"}, room=hash_id)
-        session.pop("hash_id", None)
-        leave_room(hash_id)
-
-@socketio.on("create_message")
-def on_create_message(payload):
-    hash_id = payload["hash_id"]
-    text = payload["text"]
-
-    user_id = session.get("user_id")
-    room = get_room_from_hash_id(hash_id)
-    message = Message(
-            text=text,
-            user_id=user_id,
-            room_id=room.id,
-            )
-    db.session.add(message)
-    db.session.commit()
-
-    user = User.query.get(user_id)
-    emit("room_message", {"name": user.name, "text": text}, room=hash_id)
 
 @bp.route("/")
 @login_required
@@ -71,10 +49,20 @@ def index():
     ルームの一覧
     """
 
-    if g.user.is_admin():
+    user = g.user
+
+    if user.is_admin():
         rooms = Room.query.all()
     else:
-        rooms = Room.query.filter_by(status=Status.AVAILABLE).all()
+        my_rooms = Room.query \
+                .filter(or_(Room.status==Status.AVAILABLE, Room.status==Status.OCCUPIED)) \
+                .join(Room.users, aliased=True).filter_by(id=user.id) \
+                .all()
+        available_rooms = Room.query.filter_by(status=Status.AVAILABLE).all()
+        available_rooms = set(available_rooms) - set(my_rooms)
+        rooms = sorted(set(available_rooms), key=lambda room: room.id)
+        rooms = [*my_rooms, *rooms]
+
     return render_template("rooms/index.html", rooms=rooms)
 
 @bp.route("/<string:hash_id>", methods=["GET"])
@@ -87,18 +75,25 @@ def show(hash_id):
     ルームの閲覧
     """
 
-    room = get_room_from_hash_id(hash_id)
+    user = g.user
+    room = fetch_room_from_hash_id(hash_id)
+
     if room is None:
         abort(404)
 
     try:
-        if g.user.is_admin():
+        if user.is_admin():
             scenarios = room.scenarios
-            return render_template("rooms/show.html", room=room, scenarios=scenarios)
+        else:
+            if room.status == Status.USED:
+                abort(404)
 
-        room.join_user(g.user)
-        scenario = room.fetch_scenario_of(g.user)
-        return render_template("rooms/show.html", room=room, scenarios=[scenario])
+            room.include(user)
+            scenarios = [room.fetch_scenario_of(user)]
+
+        current_app.logger.info(f"[/rooms/{hash_id}] {user}")
+        return render_template("rooms/show.html", room=room, scenarios=scenarios)
+
     except Exception as error:
         flash(error.args[0])
 
@@ -114,9 +109,9 @@ def edit(hash_id):
     ルームの編集
     """
 
-    room = get_room_from_hash_id(hash_id)
-    scenarios = get_scenarios()
-    if room is None or scenarios is None:
+    room = fetch_room_from_hash_id(hash_id)
+
+    if room is None:
         abort(404)
 
     if request.method == "POST":
@@ -124,7 +119,6 @@ def edit(hash_id):
             if "scenarios" in request.form:
                 room.scenarios = []
                 for scenario_id in request.form.getlist("scenarios"):
-                    scenario_id = int(scenario_id)
                     scenario = Scenario.query.get(scenario_id)
                     room.scenarios.append(scenario)
 
@@ -137,12 +131,15 @@ def edit(hash_id):
             db.session.add(room)
             db.session.commit()
 
+            current_app.logger.info(f"[/rooms/{hash_id}/edit] {room}")
+
         except ValidationError as error:
             flash(error.args[0])
             return redirect(url_for("rooms.edit", hash_id=hash_id))
 
         return redirect(url_for("rooms.index"))
 
+    scenarios = Scenario.query.all()
     return render_template("rooms/edit.html", room=room, scenarios=scenarios)
 
 @bp.route("/create", methods=["GET", "POST"])
@@ -163,10 +160,14 @@ def create():
                         )
             else:
                 room = Room()
+
             db.session.add(room)
             db.session.commit()
+
+            current_app.logger.info(f"[/rooms/create] {room}")
             flash("新しいRoomを作成しました")
             return redirect(url_for("rooms.index"))
+
         except ValidationError as error:
             flash(error.args[0])
             return redirect(url_for("rooms.create"))
@@ -182,11 +183,13 @@ def delete(hash_id):
     ルームの削除
     """
 
-    room = get_room_from_hash_id(hash_id)
+    room = fetch_room_from_hash_id(hash_id)
+
     if room is None:
-        response = jsonify({"status": "Not Found"})
-        response.status_code = 404
-        return response
+        abort(404)
+
     db.session.delete(room)
     db.session.commit()
+
+    current_app.logger.info(f"[/rooms/{hash_id}/delete] {room}")
     return redirect(url_for("rooms.index"))

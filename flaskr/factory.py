@@ -1,10 +1,6 @@
 from flask import Flask
-from flask_socketio import SocketIO
-from flaskr.core import db
 from flaskr import logs, views
-
-
-socketio = SocketIO()
+from flaskr.core import db, socketio
 
 
 def create_app(test_config=None):
@@ -15,11 +11,9 @@ def create_app(test_config=None):
     else:
         app.config.from_mapping(test_config)
 
-    db.init_app(app)
     logs.init_app(app)
     views.init_app(app)
-
+    db.init_app(app)
     socketio.init_app(app)
-    socketio.run(app=app, host="localhost", port="5001")
 
     return app

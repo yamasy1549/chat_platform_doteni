@@ -1,4 +1,4 @@
-from sqlalchemy.orm import synonym, validates
+from sqlalchemy.orm import validates
 from flaskr.core import db
 from flaskr.models.error import ValidationError
 
@@ -22,4 +22,4 @@ class Message(db.Model):
         return value
 
     def __repr__(self):
-        return "<Message id={id} room_id={room_id} user_id={user_id} text={text!r}>".format(id=self.id, room_id=self.room_id, user_id=user_id, text=text)
+        return "<Message id={self.id} room_id={self.room_id} user_id={self.user_id} text={self.text!r}>".format(self=self)

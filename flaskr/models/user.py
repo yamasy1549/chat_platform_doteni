@@ -3,10 +3,11 @@ from sqlalchemy.orm import synonym, validates
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.core import db
 from flaskr.models.error import ValidationError
+from flaskr.models.room_user import room_users
 
 
 class Role(enum.Enum):
-    ADMIN = 1
+    ADMIN  = 1
     NORMAL = 2
 
     def to_text(self):
@@ -21,7 +22,7 @@ class User(db.Model):
 
     id        = db.Column("id",       db.Integer,     primary_key=True)
     name      = db.Column("name",     db.String(100), nullable=False, unique=True)
-    role      = db.Column("role",     db.Enum(Role),  nullable=False,              default=Role.NORMAL.name)
+    role      = db.Column("role",     db.Enum(Role),  nullable=False,              default=Role.NORMAL)
     _password = db.Column("password", db.String(100), nullable=False)
     messages  = db.relationship("Message", backref="user", lazy=True)
 
@@ -63,7 +64,10 @@ class User(db.Model):
     @validates("role")
     def validate_role(self, key, value):
         if not value:
-            value = Role.NORMAL.value
+            value = Role.NORMAL
+
+        if type(value) == Role:
+            return value
 
         try:
             value = int(value)
@@ -71,23 +75,47 @@ class User(db.Model):
         except ValueError:
             raise ValidationError("ロールの値を正しく指定してください。")
 
-        return value.name
+        return value
+
+    def __repr__(self):
+        return "<User id={self.id} name={self.name!r}>".format(self=self)
 
     @classmethod
     def authenticate(cls, query, name, password):
         user = query(cls).filter(cls.name==name).first()
+
         if user is None:
             return None, False
+
         return user, user.check_password(password)
 
     def check_password(self, password):
         password = password.strip()
+
         if not password:
             return False
+
         return check_password_hash(self.password, password)
 
     def is_admin(self):
+        """
+        管理者かどうか
+
+        Return
+        ------
+        bool
+        """
+
         return self.role == Role.ADMIN
 
-    def __repr__(self):
-        return u"<User id={self.id} name={self.name!r}>".format(self=self)
+    def has_occupied_room(self):
+        """
+        使用中のルームがあるかどうか
+
+        Return
+        ------
+        bool
+        """
+
+        rooms = self.rooms
+        return len(rooms) > 0

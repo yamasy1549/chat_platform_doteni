@@ -7,7 +7,7 @@ class Scenario(db.Model):
     __tablename__ = "scenarios"
 
     id    = db.Column("id",    db.Integer,      primary_key=True)
-    title = db.Column("title", db.String(100),  nullable=False, unique=True)
+    title = db.Column("title", db.String(100),  nullable=False,   unique=True)
     text  = db.Column("text",  db.String(5000), nullable=False)
 
     @validates("title")
@@ -15,7 +15,7 @@ class Scenario(db.Model):
         if not value:
             raise ValidationError("タイトルは必須です。")
 
-        if Scenario.query.filter(Scenario.title == value).first():
+        if Scenario.query.filter_by(title=value).first():
             raise ValidationError("タイトルはすでに登録されています。")
 
         if len(value) < 1:
@@ -24,5 +24,4 @@ class Scenario(db.Model):
         return value
 
     def __repr__(self):
-        return "<Scenario id={id} title={title!r}>".format(id=self.id, title=self.title)
-
+        return "<Scenario id={self.id} title={self.title!r}>".format(self=self)

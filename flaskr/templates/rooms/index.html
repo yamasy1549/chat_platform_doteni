@@ -18,6 +18,11 @@
           </div>
         </header>
         <div class="body">
+          <ul>
+            {% for user in room.users %}
+            <li>{{ user.name }}</li>
+            {% endfor %}
+          </ul>
         </div>
         {% if g.user.is_admin() %}
           <form action="{{ url_for('rooms.edit', hash_id=room.hash_id) }}">

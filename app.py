@@ -9,3 +9,7 @@ def init_db():
     """
 
     init_db_with_seeds()
+
+
+if __name__ == "__main__":
+    app.run()
