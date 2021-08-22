@@ -4,11 +4,16 @@
   <ol class="rooms">
   {% for room in rooms %}
     <li class="card">
-      <a href={{ url_for('rooms.show', hash_id=room.hash_id) }}>
+      {% if g.user.is_admin() %}
+        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }}>
+      {% else %}
+        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} onclick="return confirm('このルームに入室しますか？')">
+      {% endif %}
+
         <header class="header">
-          <h2 class="title">ルーム</h2>
+          <h2 class="title">{{ room.name }}</h2>
           <div class="flex_spacebetween">
-            <small>定員 {{ room.capacity() }}人</small>
+            <small>定員 {{ room.users|length }}/{{ room.capacity() }}人</small>
             <small>{{ room.status.to_text() }}</small>
           </div>
         </header>

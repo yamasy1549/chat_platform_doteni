@@ -24,15 +24,32 @@ def get_scenarios():
 
 @socketio.on("join")
 def on_join(payload):
-    hash_id = payload["hash_id"]
-    join_room(hash_id)
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
+    if not user.is_admin():
+        hash_id = payload["hash_id"]
+        session["hash_id"] = hash_id
+        join_room(hash_id)
+        emit("room_message", {"name": user.name, "text": "入室しました"}, room=hash_id)
+
+@socketio.on("disconnect")
+def on_disconnect():
+    user_id = session.get("user_id")
+    user = User.query.get(user_id)
+
+    if not user.is_admin():
+        hash_id = session.get("hash_id")
+        emit("room_message", {"name": user.name, "text": "退室しました"}, room=hash_id)
+        session.pop("hash_id", None)
+        leave_room(hash_id)
 
 @socketio.on("create_message")
 def on_create_message(payload):
     hash_id = payload["hash_id"]
     text = payload["text"]
 
-    user_id = int(session["user_id"])
+    user_id = session.get("user_id")
     room = get_room_from_hash_id(hash_id)
     message = Message(
             text=text,
@@ -44,7 +61,6 @@ def on_create_message(payload):
 
     user = User.query.get(user_id)
     emit("room_message", {"name": user.name, "text": text}, room=hash_id)
-    #  emit("room_message", {"name": user.name, "text": text}, broadcast=True)
 
 @bp.route("/")
 @login_required
@@ -75,7 +91,18 @@ def show(hash_id):
     if room is None:
         abort(404)
 
-    return render_template("rooms/show.html", room=room)
+    try:
+        if g.user.is_admin():
+            scenarios = room.scenarios
+            return render_template("rooms/show.html", room=room, scenarios=scenarios)
+
+        room.join_user(g.user)
+        scenario = room.fetch_scenario_of(g.user)
+        return render_template("rooms/show.html", room=room, scenarios=[scenario])
+    except Exception as error:
+        flash(error.args[0])
+
+    return redirect(url_for("rooms.index"))
 
 @bp.route("/<string:hash_id>/edit", methods=["GET", "POST"])
 @admin_required
@@ -103,6 +130,9 @@ def edit(hash_id):
 
             if "status" in request.form:
                 room.status = request.form["status"]
+
+            if "name" in request.form:
+                room.name = request.form["name"]
 
             db.session.add(room)
             db.session.commit()

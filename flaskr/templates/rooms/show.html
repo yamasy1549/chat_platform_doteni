@@ -4,11 +4,9 @@
   <div class="flex">
     <div class="scenario_area">
       <h3>シナリオ</h3>
-      {% if room.scenarios %}
-        {% for scenario in room.scenarios %}
-          <pre>{{ scenario.text }}</pre>
-        {% endfor %}
-      {% endif %}
+      {% for scenario in scenarios %}
+        <pre>{{ scenario.text }}</pre>
+      {% endfor %}
     </div>
 
     <div class="message_area">
@@ -48,7 +46,7 @@
     socket.on("connect", function() {
       socket.emit("join", {
         hash_id: hash_id,
-      })
+      });
 
       socket.on("room_message", function(payload) {
         const name = payload.name

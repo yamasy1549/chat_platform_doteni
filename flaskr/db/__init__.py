@@ -21,7 +21,7 @@ def init_db_with_seeds():
     init_db()
 
     with app.app_context():
-        db.session.bulk_save_objects([Room(status=d[0]) for d in rooms])
+        db.session.bulk_save_objects([Room(name=d[0], status=d[1]) for d in rooms])
         db.session.bulk_save_objects([User(name=d[0], role=d[1], password=d[2]) for d in users])
         db.session.bulk_save_objects([Scenario(title=d[0], text=d[1]) for d in scenarios])
         db.session.bulk_save_objects([Message(text=d[0], room_id=d[1], user_id=d[2]) for d in messages])

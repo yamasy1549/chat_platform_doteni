@@ -7,7 +7,7 @@
 
     <div class="form_horizontal">
       <label for="name">名前</label>
-      <input type=text size=20 name=name value="{{ user.name if user }}">
+      <input type="text" size="20" name="name" value="{{ user.name if user }}">
     </div>
 
     <div class="form_horizontal">
@@ -23,7 +23,7 @@
   {% if user %}
     <form action={{ url_for('users.delete', user_id=user.id) }} method="post">
       <input type="hidden" name="_method" value="delete">
-      <input type=submit value="削除" onclick="return confirm('本当に削除しますか？')" class="button danger">
+      <input type="submit" value="削除" onclick="return confirm('本当に削除しますか？')" class="button danger">
     </form>
   {% endif %}
 {% endblock %}

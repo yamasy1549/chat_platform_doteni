@@ -6,6 +6,11 @@
   <form action="" method="post">
 
     <div class="form_horizontal">
+      <label for="name">名前</label>
+      <input type="text" size="20" name="name" value="{{ room.name if room }}">
+    </div>
+
+    <div class="form_horizontal">
       <label for="status">ステータス</label>
       <select id="status" name="status">
         <option value="1" {{ 'selected' if room and room.status.value == 1 }}>使用不可</option>
