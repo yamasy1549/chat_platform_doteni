@@ -9,23 +9,21 @@
 <body>
 
 <div class="page">
-  <h1>対話プラットフォーム</h1>
-
-  <nav class="global_nav">
-    <ol>
+  <nav>
+    <ol class="global_nav css-reset-list">
       {% if session.user_id %}
         {% if g.user.is_admin() %}
-          <li><a href="{{ url_for('scenarios.index') }}">シナリオ一覧</a></li>
-          <li><a href="{{ url_for('rooms.index') }}">ルーム一覧</a></li>
-          <li><a href="{{ url_for('users.index') }}">ユーザ一覧</a></li>
+          <li><a href="{{ url_for('scenarios.index') }}" class="css-reset-a">シナリオ一覧</a></li>
+          <li><a href="{{ url_for('rooms.index') }}" class="css-reset-a">ルーム一覧</a></li>
+          <li><a href="{{ url_for('users.index') }}" class="css-reset-a">ユーザ一覧</a></li>
         {% else %}
-          <li><a href="{{ url_for('rooms.index') }}">ルーム一覧</a></li>
+          <li><a href="{{ url_for('rooms.index') }}" class="css-reset-a">ルーム一覧</a></li>
         {% endif %}
 
-        <li><a href="{{ url_for('auth.logout') }}">{{ g.user.name }}からログアウト</a></li>
+        <li><a href="{{ url_for('auth.logout') }}" class="css-reset-a">{{ g.user.name }}からログアウト</a></li>
       {% else %}
-        <li><a href="{{ url_for('auth.login') }}">ログイン</a></li>
-        <li><a href="{{ url_for('users.create') }}">ユーザ新規登録</a></li>
+        <li><a href="{{ url_for('auth.login') }}" class="css-reset-a">ログイン</a></li>
+        <li><a href="{{ url_for('users.create') }}" class="css-reset-a">ユーザ新規登録</a></li>
       {% endif %}
     </ol>
   </nav>
@@ -34,7 +32,9 @@
     <div class="flash">{{ message }}</div>
   {% endfor %}
 
+  <main>
   {% block body %}{% endblock %}
+  </main>
 </div>
 
 </body>

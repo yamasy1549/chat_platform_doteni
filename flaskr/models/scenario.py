@@ -15,7 +15,7 @@ class Scenario(db.Model):
         if not value:
             raise ValidationError("タイトルは必須です。")
 
-        if Scenario.query.filter_by(title=value).first():
+        if Scenario.query.filter_by(title=value).filter(Scenario.id != self.id).first():
             raise ValidationError("タイトルはすでに登録されています。")
 
         if len(value) < 1:

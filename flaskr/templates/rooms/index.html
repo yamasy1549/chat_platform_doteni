@@ -1,18 +1,26 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <ol class="rooms">
+  <header class="page_header css-flex css-spacebetween">
+    <h1>ルーム一覧</h1>
+
+    {% if g.user.is_admin() %}
+      <a class="button" href="{{ url_for('rooms.create') }}">ルーム新規登録</a>
+    {% endif %}
+  </header>
+
+  <ol class="card_showcase css-reset-list">
   {% for room in rooms %}
-    <li class="card">
+      <li class="card room {{ room.status.to_text() }}">
       {% if g.user.is_admin() %}
-        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }}>
+        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} class="css-reset-a">
       {% else %}
-        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} onclick="return confirm('このルームに入室しますか？')">
+        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} class="css-reset-a" onclick="return confirm('このルームに入室しますか？')">
       {% endif %}
 
         <header class="header">
           <h2 class="title">{{ room.name }}</h2>
-          <div class="flex_spacebetween">
+          <div class="css-flex css-spacebetween">
             <small>定員 {{ room.users|length }}/{{ room.capacity() }}人</small>
             <small>{{ room.status.to_text() }}</small>
           </div>
@@ -24,6 +32,7 @@
             {% endfor %}
           </ul>
         </div>
+
         {% if g.user.is_admin() %}
           <form action="{{ url_for('rooms.edit', hash_id=room.hash_id) }}">
             <input type="submit" value="編集" class="button">
@@ -35,8 +44,4 @@
     <li>ルームがありません。</li>
   {% endfor %}
   </ol>
-
-  {% if g.user.is_admin() %}
-    <a class="button" href="{{ url_for('rooms.create') }}">ルーム新規登録</a>
-  {% endif %}
 {% endblock %}

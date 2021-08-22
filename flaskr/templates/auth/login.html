@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <h2>ログイン</h2>
+  <header class="page_header css-flex css-spacebetween">
+    <h1>ログイン</h1>
+  </header>
 
   <form action="{{ url_for('auth.login') }}" method="post">
 
@@ -15,7 +17,7 @@
       <input type="password" name="password" id="password" />
     </div>
 
-    <div class="form_horizontal">
+    <div class="form_horizontal css-flex css-flexstart">
       <input type="submit" value="ログイン" class="button">
     </div>
   </form>

@@ -104,7 +104,10 @@ def on_create_message(payload):
     メッセージ送信時のイベント
     """
 
-    hash_id = payload["hash_id"]
-    text = payload["text"]
+    user = fetch_user()
 
-    send_room_message(hash_id, text)
+    if not user.is_admin():
+        hash_id = payload["hash_id"]
+        text = payload["text"]
+
+        send_room_message(hash_id, text)

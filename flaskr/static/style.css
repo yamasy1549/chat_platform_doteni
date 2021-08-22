@@ -1,50 +1,54 @@
 @import "reset.css";
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap");
+
+
+/* variables */
 
 :root {
-  --color--white:       #FFFFFF;
+  --color--white:       #ffffff;
   --color--black:       #333333;
-  --color--gray:        #EFEFEF;
-  --color--green:       #2FB76A;
-  --color--blue:        #1F6CE9;
-  --color--lightblue:   #66CDEF;
-  --color--darkblue:    #1B59BE;
-  --color--red:         #F33A3A;
-  --color--darkred:     #BE1414;
+  --color--khaki-light: #f5f2ea;
+  --color--blue:        #0d6efd;
+  --color--blue-dark:   #064bb1;
+  --color--red:         #ff394c;
+  --color--red-dark:    #c32b3a;
+  --color--pink:        #f81887;
+  --color--pink-dark:   #c5106a;
+  --color--orange:      #ff7622;
+  --color--yellow:      #ffd700;
+  --color--yellow-dark: #dcba03;
+  --color--green:       #5fbb28;
+  --color--green-dark:  #478d1d;
+  --color--cyan:        #20bfff;
+  --color--navy:        #0a2249;
+  --color--navy-light:  #93a4bf;
+  --color--navy-dark:   #020f25;
 
-  --coloralpha--black: #3333332F;
+  --color--black-alpha:  #3333332F;
+  --color--yellow-alpha: #ffc1072F;
+  --color--cyan-alpha:   #0dcaf02F;
+
+  --font--default: "Noto Sans", sans-serif;
 }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+
+/* general */
 
 body {
-  color: var(--color--black);
+  min-height: auto;
+  font-family: var(--font--default);
+  color: var(--color--navy);
+  background: var(--color--khaki-light);
 }
 
 h1 {
-  display: none;
+  font-size: 1.5rem;
 }
 
 pre {
+  font-family: var(--font--default);
+  margin: 0;
   white-space: pre-wrap;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex_spacebetween {
-  display: flex;
-  justify-content: space-between;
-}
-
-.form_horizontal {
-  display: flex;
-  margin: 10px auto;
-}
-.form_horizontal > * {
-  margin-right: 10px;
 }
 
 .button {
@@ -56,76 +60,69 @@ pre {
   cursor: pointer;
   padding: 4px 10px;
   background: var(--color--blue);
-  color: var(--color--white);
   border: 0;
   border-radius: 2px;
+  color: var(--color--white);
 }
 .button:hover {
-  background: var(--color--darkblue);
+  background: var(--color--blue-dark);
 }
-
 .button.danger {
-  background: var(--color--red);
+  background: var(--color--pink);
 }
 .button.danger:hover {
-  background: var(--color--darkred);
+  background: var(--color--pink-dark);
 }
 
-
-/* layout */
-
-.page {
-  max-width: 800px;
-  margin: 20px auto;
+.page_header {
+  margin: 10px auto 20px;
 }
 
-.global_nav {
-}
-.global_nav ol {
-  width: 100%;
+.form_horizontal {
   display: flex;
-  justify-content: space-between;
-  list-style: none;
+  flex-direction: column;
+  margin: 10px 0;
+}
+.form_horizontal input[type="text"],
+.form_horizontal input[type="password"],
+.form_horizontal select {
+  max-width: 300px;
+}
+.form_horizontal textarea {
+  min-height: 200px;
 }
 
-.flash {
-  background: var(--color--lightblue);
-  padding: 10px 20px;
-  margin: 10px auto;
-}
-
-
-/* rooms */
-
-.rooms {
+.card_showcase {
   display: flex;
+  gap: 20px;
+  justify-content: center;
   flex-wrap: wrap;
-  list-style: none;
 }
 
 .card {
   width: 200px;
-  margin: 10px;
-  border-radius: 2px;
-  overflow: hidden;
-  box-shadow: 2px 2px 10px var(--coloralpha--black);
+  border: 2px solid var(--color--navy);
+  border-radius: 4px;
   position: relative;
+  overflow: hidden;
 }
-.card:hover {
-  box-shadow: 8px 8px 20px var(--coloralpha--black);
+.card:hover .header {
+  background: var(--color--navy-dark);
 }
 .card .header {
-  background: var(--color--green);
   padding: 10px;
+  background: var(--color--navy);
   color: var(--color--white);
 }
-.card .body {
-  margin: 10px;
-  min-height: 100px;
+.card .title {
+  font-size: 1.2rem;
 }
-.card a {
-  text-decoration: none;
-  color: inherit;
+.card .body {
+  background: var(--color--white);
+  padding: 10px;
+  min-height: 100px;
+  height: 100%;
+  overflow: scroll;
 }
 .card .button {
   position: absolute;
@@ -133,42 +130,130 @@ pre {
   bottom: 10px;
 }
 
-.scenario_area {
-  flex: 1;
-  background: var(--color--gray);
-  padding: 10px 20px;
-  height: calc(100vh - 40px);
+.frame {
+  border: 2px solid var(--color--navy);
+  border-radius: 4px;
+  padding: 20px;
+  background: var(--color--white);
+  overflow: scroll;
 }
 
+
+/* css-* */
+
+.css-flex {
+  display: flex;
+  gap: 10px;
+}
+.css-flex.css-spacebetween {
+  justify-content: space-between;
+}
+.css-flex.css-column {
+  flex-direction: column;
+}
+.css-flex.css-center {
+  justify-content: center;
+  align-items: center;
+}
+.css-flex.css-spacebetween {
+  justify-content: space-between;
+  align-items: center;
+}
+.css-flex.css-flexstart {
+  align-items: flex-start;
+}
+.css-flex.css-flexend {
+  align-items: flex-end;
+}
+
+.css-reset-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.css-reset-a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+/* layout.html */
+
+.page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.global_nav {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px auto;
+  padding: 10px 40px;
+  background: var(--color--white);
+  border-radius: 4px;
+}
+.global_nav a {
+  font-weight: bold;
+}
+.global_nav a:hover {
+  color: var(--color--navy-light);
+}
+
+.flash {
+  margin: 10px auto;
+  padding: 10px 20px;
+  background: var(--color--cyan);
+}
+
+main {
+  padding: 10px 0;
+}
+
+
+/* rooms/index.html */
+
+.card.room {
+  width: 200px;
+}
+.card.room.使用不可 { border-color: var(--color--yellow); }
+.card.room.使用不可 .header { background: var(--color--yellow); }
+.card.room.使用不可:hover { border-color: var(--color--yellow-dark); }
+.card.room.使用不可:hover .header { background: var(--color--yellow-dark); }
+.card.room.使用中 { border-color: var(--color--pink); }
+.card.room.使用中 .header { background: var(--color--pink); }
+.card.room.使用中:hover { border-color: var(--color--pink-dark); }
+.card.room.使用中:hover .header { background: var(--color--pink-dark); }
+.card.room.使用済み { border-color: var(--color--green); }
+.card.room.使用済み .header { background: var(--color--green); }
+.card.room.使用済み:hover { border-color: var(--color--green-dark); }
+.card.room.使用済み:hover .header { background: var(--color--green-dark); }
+
+
+/* rooms/show.html */
+
+.scenario_area,
 .message_area {
   flex: 1;
-  background: var(--color--white);
-  padding: 10px 20px;
-  height: calc(100vh - 40px);
-}
-.message_area ol {
-  list-style: none;
-  padding: 0;
-}
-
-
-/* scenarios */
-
-.scenarios {
-  display: flex;
-  flex-wrap: wrap;
-  list-style: none;
+  padding: 0 10px;
+  height: calc(100vh - 100px);
+  display: grid;
+  grid-template-rows: auto 1fr;
   gap: 10px;
 }
 
-.scenario {
-  width: 350px;
-  background: var(--color--gray);
+.message_input_area textarea {
   padding: 10px 20px;
-  position: relative;
 }
-.scenario .button {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
+
+
+/* scenarios/index.html */
+
+.card.scenario {
+  width: 320px;
+}
+
+.card.scenario .body {
+  max-height: 300px;
 }

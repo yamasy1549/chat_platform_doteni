@@ -1,41 +1,52 @@
-{% extends "layout_simple.html" %}
+{% extends "layout.html" %}
 
 {% block body %}
-  <div class="flex">
+  <div class="css-flex">
     <div class="scenario_area">
-      <h3>シナリオ</h3>
-      {% for scenario in scenarios %}
-        <pre>{{ scenario.text }}</pre>
-      {% endfor %}
+      <div>
+        <h3>シナリオ</h3>
+        <small>続きが見えない場合はスクロールしてください</small>
+      </div>
+
+      <div class="frame">
+        {% for scenario in scenarios %}
+          <pre>{{ scenario.text }}</pre>
+        {% endfor %}
+      </div>
     </div>
 
     <div class="message_area">
-      <h3>メッセージ</h3>
-      <ol id="messageList">
-        {% for message in room.messages %}
+      <div>
+        <h3>メッセージ</h3>
+        <small>続きが見えない場合はスクロールしてください</small>
+      </div>
+
+      <div class="frame" id="scrollArea">
+        <ol id="messageList" class="css-reset-list">
+          {% for message in room.messages %}
           <li>
             <div class="message">
               {{ message.user.name }}: {{ message.text }}
             </div>
           </li>
-        {% endfor %}
-      </ol>
-
-      <div class="form_horizontal">
-        <input type="submit" value="対話開始" onclick="startMessage()" class="button danger">
-        <input type="submit" value="対話終了" onclick="endMessage()" class="button danger">
-        <small>定員 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
+          {% endfor %}
+        </ol>
       </div>
 
-      <form action="" method="" id="form">
-        <div class="form_horizontal">
-          <textarea type="text" id="text" name="text" /></textarea>
-        </div>
+      <div class="message_input_area">
+        <form action="" method="" id="form" class="css-flex css-column">
+          <textarea type="text" id="text" name="text" class="frame" /></textarea>
 
-        <div class="form_horizontal">
-          <input type="submit" value="送信" class="button">
-        </div>
-      </form>
+          <div class="css-flex css-spacebetween">
+            <div class="css-flex css-center">
+              <input type="submit" value="対話開始" onclick="startMessage()" class="button danger">
+              <input type="submit" value="対話終了" onclick="endMessage()" class="button danger">
+              <small>定員 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
+            </div>
+            <input type="submit" value="送信" class="button">
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
@@ -46,6 +57,7 @@
     const form = document.getElementById("form");
     const textarea = document.getElementById("text");
     const messageList = document.getElementById("messageList");
+    const scrollArea = document.getElementById("scrollArea");
     const userList = document.getElementById("userList");
 
     const socket = io();
@@ -64,6 +76,7 @@
         div.appendChild(content);
         li.appendChild(div);
         messageList.appendChild(li);
+        scrollArea.scrollTop = scrollArea.scrollHeight
       });
 
       socket.on("room_user", function(payload) {
@@ -73,11 +86,15 @@
 
     form.addEventListener("submit", function(event) {
       event.preventDefault();
-      socket.emit("create_message", {
-        hash_id: hash_id,
-        text: textarea.value,
-      });
-      textarea.value = "";
+
+      const text = textarea.value;
+      if(text.length > 0) {
+        socket.emit("create_message", {
+          hash_id: hash_id,
+          text: textarea.value,
+        });
+        textarea.value = "";
+      }
     });
 
     function startMessage() {

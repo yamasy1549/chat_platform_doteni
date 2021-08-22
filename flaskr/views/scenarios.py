@@ -1,6 +1,7 @@
 from flask import Blueprint, abort, current_app, render_template, redirect, url_for, flash, request
 from flaskr.core import db
 from flaskr.models import Scenario
+from flaskr.models.error import ValidationError
 from flaskr.views import admin_required
 
 
@@ -35,14 +36,19 @@ def edit(scenario_id):
         abort(404)
 
     if request.method == "POST":
-        scenario.title = request.form["title"]
-        scenario.text = request.form["text"]
+        try:
+            scenario.title = request.form["title"]
+            scenario.text = request.form["text"]
 
-        db.session.add(scenario)
-        db.session.commit()
+            db.session.add(scenario)
+            db.session.commit()
 
-        current_app.logger.info(f"[/scenarios/{scenario.id}] {scenario}")
-        return redirect(url_for("scenarios.index"))
+            current_app.logger.info(f"[/scenarios/{scenario.id}] {scenario}")
+            return redirect(url_for("scenarios.index"))
+
+        except ValidationError as error:
+            flash(error.args[0])
+            return redirect(url_for("scenarios.edit", scenario_id=scenario_id))
 
     return render_template("scenarios/edit.html", scenario=scenario)
 
@@ -57,17 +63,22 @@ def create():
     """
 
     if request.method == "POST":
-        scenario = Scenario(
-                title=request.form["title"],
-                text=request.form["text"]
-                )
+        try:
+            scenario = Scenario(
+                    title=request.form["title"],
+                    text=request.form["text"]
+                    )
 
-        db.session.add(scenario)
-        db.session.commit()
+            db.session.add(scenario)
+            db.session.commit()
 
-        current_app.logger.info(f"[/scenarios/create] {scenario}")
-        flash("新しいシナリオを作成しました")
-        return redirect(url_for("scenarios.index"))
+            current_app.logger.info(f"[/scenarios/create] {scenario}")
+            flash("新しいシナリオを作成しました")
+            return redirect(url_for("scenarios.index"))
+
+        except ValidationError as error:
+            flash(error.args[0])
+            return redirect(url_for("scenarios.create"))
 
     return render_template("scenarios/edit.html")
 
@@ -85,8 +96,13 @@ def delete(scenario_id):
     if scenario is None:
         abort(404)
 
-    db.session.delete(scenario)
-    db.session.commit()
+    try:
+        db.session.delete(scenario)
+        db.session.commit()
 
-    current_app.logger.info(f"[/scenarios/{scenario_id}/delete] {scenario}")
-    return redirect(url_for("scenarios.index"))
+        current_app.logger.info(f"[/scenarios/{scenario_id}/delete] {scenario}")
+        return redirect(url_for("scenarios.index"))
+
+    except ValidationError as error:
+        flash(error.args[0])
+        return redirect(url_for("scenarios.edit", scenario_id=scenario_id))

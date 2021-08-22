@@ -154,12 +154,19 @@ def create():
 
     if request.method == "POST":
         try:
+            room = Room()
+
+            if "scenarios" in request.form:
+                room.scenarios = []
+                for scenario_id in request.form.getlist("scenarios"):
+                    scenario = Scenario.query.get(scenario_id)
+                    room.scenarios.append(scenario)
+
             if "status" in request.form:
-                room = Room(
-                        status=request.form["status"],
-                        )
-            else:
-                room = Room()
+                room.status = request.form["status"]
+
+            if "name" in request.form:
+                room.name = request.form["name"]
 
             db.session.add(room)
             db.session.commit()
@@ -172,7 +179,8 @@ def create():
             flash(error.args[0])
             return redirect(url_for("rooms.create"))
 
-    return render_template("rooms/edit.html")
+    scenarios = Scenario.query.all()
+    return render_template("rooms/edit.html", scenarios=scenarios)
 
 @bp.route("/<string:hash_id>/delete", methods=["POST"])
 @admin_required
@@ -188,8 +196,13 @@ def delete(hash_id):
     if room is None:
         abort(404)
 
-    db.session.delete(room)
-    db.session.commit()
+    try:
+        db.session.delete(room)
+        db.session.commit()
 
-    current_app.logger.info(f"[/rooms/{hash_id}/delete] {room}")
-    return redirect(url_for("rooms.index"))
+        current_app.logger.info(f"[/rooms/{hash_id}/delete] {room}")
+        return redirect(url_for("rooms.index"))
+
+    except ValidationError as error:
+        flash(error.args[0])
+        return redirect(url_for("rooms.edit", hash_id=hash_id))

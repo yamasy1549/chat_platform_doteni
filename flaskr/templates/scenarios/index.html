@@ -1,13 +1,29 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <h2>シナリオ一覧</h2>
+  <header class="page_header css-flex css-spacebetween">
+    <h1>シナリオ一覧</h1>
 
-  <ol class="scenarios">
+    {% if g.user.is_admin() %}
+      <a href="{{ url_for('scenarios.create') }}" class="button">シナリオ新規登録</a>
+    {% endif %}
+  </header>
+
+  <ol class="card_showcase css-reset-list">
     {% for scenario in scenarios %}
-      <li class="scenario">
-        <h3>{{ scenario.title }}</h3>
-        <pre>{{ scenario.text }}</pre>
+      <li class="card scenario">
+        {% if g.user.is_admin() %}
+          <a href="{{ url_for('scenarios.edit', scenario_id=scenario.id) }}" class="css-reset-a">
+        {% endif %}
+            <header class="header">
+              <h3>{{ scenario.title }}</h3>
+            </header>
+        {% if g.user.is_admin() %}
+          </a>
+        {% endif %}
+        <div class="body">
+          <pre>{{ scenario.text }}</pre>
+        </div>
 
         {% if g.user.is_admin() %}
           <a href="{{ url_for('scenarios.edit', scenario_id=scenario.id) }}" class="button">編集</a>
@@ -17,8 +33,4 @@
       <li>シナリオがありません。</li>
     {% endfor %}
   </ol>
-
-  {% if g.user.is_admin() %}
-    <a href="{{ url_for('scenarios.create') }}" class="button">シナリオ新規登録</a>
-  {% endif %}
 {% endblock %}

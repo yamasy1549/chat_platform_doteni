@@ -39,11 +39,16 @@ def edit(user_id):
         user.name = request.form["name"]
         user.password = request.form["password"]
 
-        db.session.add(user)
-        db.session.commit()
+        try:
+            db.session.add(user)
+            db.session.commit()
 
-        current_app.logger.info(f"[/users/{user_id}/edit] {user}")
-        return redirect(url_for("users.index"))
+            current_app.logger.info(f"[/users/{user_id}/edit] {user}")
+            return redirect(url_for("users.index"))
+
+        except ValidationError as error:
+            flash(error.args[0])
+            return redirect(url_for("users.edit", user_id=user_id))
 
     return render_template("users/edit.html", user=user)
 
@@ -96,8 +101,13 @@ def delete(user_id):
     if user is None:
         abort(404)
 
-    db.session.delete(user)
-    db.session.commit()
+    try:
+        db.session.delete(user)
+        db.session.commit()
 
-    current_app.logger.info(f"[/users/{user_id}/delete] {user}")
-    return redirect(url_for("users.index"))
+        current_app.logger.info(f"[/users/{user_id}/delete] {user}")
+        return redirect(url_for("users.index"))
+
+    except ValidationError as error:
+        flash(error.args[0])
+        return redirect(url_for("users.edit", user_id=user_id))

@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block body %}
-  <h2>{{ 'ルーム編集' if room else 'ルーム新規登録' }}</h2>
+  <header class="page_header css-flex css-spacebetween">
+    <h1>{{ 'ルーム編集' if room else 'ルーム新規登録' }}</h1>
+  </header>
 
   <form action="" method="post">
 
@@ -24,20 +26,22 @@
       <label for="scenarios">シナリオ</label>
       <select id="scenarios" name="scenarios" multiple>
         {% for scenario in scenarios %}
-          <option value={{ scenario.id }} {{ 'selected' if scenario in room.scenarios }}>{{ scenario.title }}</option>
+          <option value={{ scenario.id }} {{ 'selected' if room and scenario in room.scenarios }}>{{ scenario.title }}</option>
         {% endfor %}
       </select>
     </div>
 
-    <div class="form_horizontal">
+    <div class="form_horizontal css-flex css-flexend">
       <input type="submit" value={{ '保存' if room else '新規登録' }} class="button">
     </div>
   </form>
 
   {% if room %}
     <form action={{ url_for('rooms.delete', hash_id=room.hash_id) }} method="post">
-      <input type="hidden" name="_method" value="delete">
-      <input type="submit" value="削除" onclick="return confirm('本当に削除しますか？')" class="button danger">
+      <div class="form_horizontal css-flex css-flexend">
+        <input type="hidden" name="_method" value="delete">
+        <input type="submit" value="削除" onclick="return confirm('本当に削除しますか？')" class="button danger">
+      </div>
     </form>
   {% endif %}
 {% endblock %}
