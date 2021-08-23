@@ -10,7 +10,7 @@
 
       <div class="frame">
         {% for scenario in scenarios %}
-          <pre>{{ scenario.text }}</pre>
+          <pre>{{ scenario.text|safe }}</pre>
         {% endfor %}
       </div>
     </div>
