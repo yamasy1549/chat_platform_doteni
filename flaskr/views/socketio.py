@@ -8,7 +8,7 @@ from flaskr.views.rooms import fetch_user, fetch_room_from_hash_id
 clients = set()
 
 
-def send_room_message(hash_id, text, save=True):
+def send_room_message(hash_id, text, save=True, classname=""):
     user = fetch_user()
     room = fetch_room_from_hash_id(hash_id)
     message = Message(
@@ -22,7 +22,7 @@ def send_room_message(hash_id, text, save=True):
         db.session.commit()
 
     current_app.logger.info(f"[/rooms/{hash_id}] {user} {message}")
-    emit("room_message", {"name": user.name, "text": text}, room=hash_id)
+    emit("room_message", {"name": user.name, "text": text, "classname": classname}, room=hash_id)
 
 
 @socketio.on("join")
@@ -40,7 +40,7 @@ def on_join(payload):
         session["hash_id"] = hash_id
 
         join_room(hash_id)
-        send_room_message(hash_id, "[log] 入室しました", save=False)
+        #  send_room_message(hash_id, "### 入室しました ###", save=False, classname="log")
 
         clients.add(user.name)
         emit("room_user", {"users": list(clients)}, room=hash_id)
@@ -59,7 +59,7 @@ def on_disconnect():
         hash_id = session.get("hash_id")
         session.pop("hash_id", None)
 
-        send_room_message(hash_id, "[log] 退室しました", save=False)
+        #  send_room_message(hash_id, "### 退室しました ###", save=False, classname="log")
         leave_room(hash_id)
 
         clients.discard(user.name)
@@ -78,7 +78,7 @@ def on_meta_start_message():
     if not user.is_admin():
         hash_id = session.get("hash_id")
 
-        send_room_message(hash_id, "[log] 対話開始")
+        send_room_message(hash_id, "### 対話開始 ###", classname="log")
 
 @socketio.on("meta_end_message")
 def on_meta_end_message():
@@ -93,7 +93,7 @@ def on_meta_end_message():
     if not user.is_admin():
         hash_id = session.get("hash_id")
 
-        send_room_message(hash_id, "[log] 対話終了")
+        send_room_message(hash_id, "### 対話終了 ###", classname="log")
 
 
 @socketio.on("create_message")
