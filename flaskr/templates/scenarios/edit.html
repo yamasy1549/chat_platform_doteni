@@ -13,6 +13,11 @@
     </div>
 
     <div class="form_horizontal">
+      <label for="displayname">表示名</label>
+      <input type="text" name="displayname" value="{{ scenario.displayname if scenario }}">
+    </div>
+
+    <div class="form_horizontal">
       <label for="text">本文</label>
       <textarea type="text" name="text">{{ scenario.text if scenario }}</textarea>
     </div>

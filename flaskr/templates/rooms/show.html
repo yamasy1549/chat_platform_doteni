@@ -26,7 +26,7 @@
           {% for message in room.messages %}
           <li>
             <div class="message">
-              {{ message.user.name }}: {{ message.text }}
+              {{ room.displayname_of(message.user) }}: {{ message.text }}
             </div>
           </li>
           {% endfor %}

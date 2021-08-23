@@ -138,3 +138,19 @@ class Room(db.Model):
 
         index = self.users.index(user)
         return self.scenarios[index]
+
+    def displayname_of(self, user):
+        """
+        表示名を決める
+
+        Parameters
+        ----------
+        user (User) : 表示したいユーザ
+
+        Return
+        ------
+        str
+        """
+
+        scenario = self.fetch_scenario_of(user)
+        return scenario.displayname_of(user)

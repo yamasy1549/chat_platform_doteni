@@ -6,9 +6,10 @@ from flaskr.models.error import ValidationError
 class Scenario(db.Model):
     __tablename__ = "scenarios"
 
-    id    = db.Column("id",    db.Integer,      primary_key=True)
-    title = db.Column("title", db.String(100),  nullable=False,   unique=True)
-    text  = db.Column("text",  db.String(5000), nullable=False)
+    id          = db.Column("id",          db.Integer,      primary_key=True)
+    title       = db.Column("title",       db.String(100),  nullable=False,   unique=True)
+    text        = db.Column("text",        db.String(5000), nullable=False)
+    displayname = db.Column("displayname", db.String(100))
 
     @validates("title")
     def validate_name(self, key, value):
@@ -25,3 +26,21 @@ class Scenario(db.Model):
 
     def __repr__(self):
         return "<Scenario id={self.id} title={self.title!r}>".format(self=self)
+
+    def displayname_of(self, user):
+        """
+        表示名を決める
+
+        Parameters
+        ----------
+        user (User) : 表示したいユーザ
+
+        Return
+        ------
+        str
+        """
+
+        if self.displayname:
+            return self.displayname
+
+        return user.name

@@ -40,6 +40,9 @@ def edit(scenario_id):
             scenario.title = request.form["title"]
             scenario.text = request.form["text"]
 
+            if "displayname" in request.form:
+                scenario.displayname = request.form["displayname"]
+
             db.session.add(scenario)
             db.session.commit()
 
@@ -64,10 +67,12 @@ def create():
 
     if request.method == "POST":
         try:
-            scenario = Scenario(
-                    title=request.form["title"],
-                    text=request.form["text"]
-                    )
+            scenario = Scenario()
+            scenario.title = request.form["title"],
+            scenario.title = request.form["text"],
+
+            if "displayname" in request.form:
+                scenario.displayname = request.form["displayname"]
 
             db.session.add(scenario)
             db.session.commit()

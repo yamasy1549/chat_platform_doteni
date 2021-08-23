@@ -17,6 +17,9 @@
         {% endif %}
             <header class="header">
               <h3>{{ scenario.title }}</h3>
+              {% if scenario.displayname %}
+                <small>{{ scenario.displayname }}</small>
+              {% endif %}
             </header>
         {% if g.user.is_admin() %}
           </a>

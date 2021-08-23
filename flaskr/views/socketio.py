@@ -11,6 +11,8 @@ clients = set()
 def send_room_message(hash_id, text, save=True, classname=""):
     user = fetch_user()
     room = fetch_room_from_hash_id(hash_id)
+    scenario = room.fetch_scenario_of(user)
+
     message = Message(
             text=text,
             user_id=user.id,
@@ -22,7 +24,7 @@ def send_room_message(hash_id, text, save=True, classname=""):
         db.session.commit()
 
     current_app.logger.info(f"[/rooms/{hash_id}] {user} {message}")
-    emit("room_message", {"name": user.name, "text": text, "classname": classname}, room=hash_id)
+    emit("room_message", {"name": scenario.displayname_of(user), "text": text, "classname": classname}, room=hash_id)
 
 
 @socketio.on("join")
