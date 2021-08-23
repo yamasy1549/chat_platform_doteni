@@ -67,9 +67,10 @@ def create():
 
     if request.method == "POST":
         try:
+
             scenario = Scenario()
-            scenario.title = request.form["title"],
-            scenario.title = request.form["text"],
+            scenario.title = request.form["title"]
+            scenario.text = request.form["text"]
 
             if "displayname" in request.form:
                 scenario.displayname = request.form["displayname"]
