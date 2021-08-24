@@ -1,0 +1,6 @@
+.git
+.gitignore
+
+flaskr/*.db
+__pycache__
+logs

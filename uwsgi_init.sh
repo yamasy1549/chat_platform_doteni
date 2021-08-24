@@ -1,0 +1,1 @@
+flask init_db_with_seeds

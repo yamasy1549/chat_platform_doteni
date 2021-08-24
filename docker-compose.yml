@@ -1,21 +1,20 @@
-version: "3"
+version: "2"
 services:
 
   uwsgi:
-    build: .
-    volumes:
-      - .:/var/www/
+    image: "yamasy1549/chat_platform_doteni_uwsgi"
     ports:
       - "3031:3031"
     environment:
       TZ: "Asia/Tokyo"
+    logging:
+      driver: "awslogs"
+      options:
+        awslogs-region: "ap-northeast-1"
+        awslogs-group: "uwsgi"
 
   nginx:
-    build: ./nginx
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-      - /tmp/nginx_log:/var/log/nginx
-      - ./flaskr/static:/var/static
+    image: "yamasy1549/chat_platform_doteni_nginx"
     links:
       - uwsgi
     ports:

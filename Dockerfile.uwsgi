@@ -1,0 +1,15 @@
+FROM python:3.8
+
+RUN mkdir -p /var/www
+WORKDIR /var/www
+
+COPY . /var/www
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY uwsgi_init.sh ./
+RUN /bin/bash uwsgi_init.sh
+
+EXPOSE 3031
+CMD ["uwsgi", "--ini", "/var/www/uwsgi.ini"]
