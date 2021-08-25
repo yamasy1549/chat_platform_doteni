@@ -41,9 +41,12 @@
             <div class="css-flex css-center">
               <input type="submit" value="対話開始" onclick="startMessage()" class="button danger">
               <input type="submit" value="対話終了" onclick="endMessage()" class="button danger">
-              <small>定員 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
+              <small>現在の人数 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
             </div>
-            <input type="submit" value="送信" class="button">
+            <div class="css-flex css-center">
+              <small><span id="charCount">0</span>文字</small>
+              <input type="submit" value="送信" class="button">
+            </div>
           </div>
         </form>
       </div>
@@ -56,57 +59,82 @@
 
     const form = document.getElementById("form");
     const textarea = document.getElementById("text");
+    const charCount = document.getElementById("charCount");
     const messageList = document.getElementById("messageList");
     const scrollArea = document.getElementById("scrollArea");
     const userList = document.getElementById("userList");
 
+    //////////////////////////////
+    // ここからソケット通信関連 //
+
     const socket = io();
 
     socket.on("connect", function() {
+      // 入室時（初回の入室とは限らないことに注意）のメッセージを送信
       socket.emit("join", {
         hash_id: hash_id,
       });
 
+      // 入室時（初回の入室とは限らないことに注意）のメッセージを受信
+      socket.on("room_user", function(payload) {
+        // 現在の接続人数を表示
+        userList.innerText = payload.users.length;
+      });
+
+      // ルームに対するメッセージを受信
       socket.on("room_message", function(payload) {
+        // メッセージ表示DOMを追加する
         const li = document.createElement("li");
         const div = document.createElement("div");
         const content = document.createTextNode(`${payload.name}: ${payload.text}`);
-
         div.classList.add("message");
         div.appendChild(content);
         li.appendChild(div);
         messageList.appendChild(li);
-        scrollArea.scrollTop = scrollArea.scrollHeight
-      });
 
-      socket.on("room_user", function(payload) {
-        userList.innerText = payload.users.length;
+        // 自動で一番下までスクロール
+        scrollArea.scrollTop = scrollArea.scrollHeight
       });
     });
 
+    // 送信ボタンクリック時
     form.addEventListener("submit", function(event) {
       event.preventDefault();
 
       const text = textarea.value;
       if(text.length > 0) {
+        // メッセージを送信
         socket.emit("create_message", {
           hash_id: hash_id,
           text: textarea.value,
         });
         textarea.value = "";
+        charCount.innerText = 0;
       }
     });
 
+    // 対話開始ボタン
     function startMessage() {
       if(confirm("対話を開始しますか？")) {
         socket.emit("meta_start_message");
       }
     }
 
+    // 対話終了ボタン
     function endMessage() {
       if(confirm("対話を終了しますか？")) {
         socket.emit("meta_end_message");
       }
     }
+
+    // ここまでソケット通信関連 //
+    //////////////////////////////
+
+
+    // 入力文字数を表示
+    textarea.addEventListener("input", function(event) {
+      const count = textarea.value.length;
+      charCount.innerText = count;
+    });
   </script>
 {% endblock %}
