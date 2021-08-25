@@ -41,7 +41,7 @@
             <div class="css-flex css-center">
               <input type="submit" value="対話開始" onclick="startMessage()" class="button danger">
               <input type="submit" value="対話終了" onclick="endMessage()" class="button danger">
-              <small>現在の人数 <span id="userList">0</span>/{{ room.scenarios|length }}人</small>
+              <small>現在の人数 <span id="userCount">0</span>/{{ room.scenarios|length }}人<span id="userList"></span></small>
             </div>
             <div class="css-flex css-center">
               <small><span id="charCount">0</span>文字</small>
@@ -62,6 +62,7 @@
     const charCount = document.getElementById("charCount");
     const messageList = document.getElementById("messageList");
     const scrollArea = document.getElementById("scrollArea");
+    const userCount = document.getElementById("userCount");
     const userList = document.getElementById("userList");
 
     //////////////////////////////
@@ -78,7 +79,11 @@
       // 入室時（初回の入室とは限らないことに注意）のメッセージを受信
       socket.on("room_user", function(payload) {
         // 現在の接続人数を表示
-        userList.innerText = payload.users.length;
+        userCount.innerText = payload.users.length;
+
+        // ユーザ名を表示
+        const userNameList = payload.users;
+        userList.innerText = `（${userNameList.join(", ")}）`;
       });
 
       // ルームに対するメッセージを受信
