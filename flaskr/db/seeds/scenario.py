@@ -24,6 +24,10 @@ def load_csv_data(csv_file):
         scenario1 = ""
         scenario2 = ""
 
+
+        scenario1 += "アンケートURLはこちらです。対話が1つ終わるごとにアンケートに回答してください。<br><a href='https://forms.gle/GVgJXbukX2biFjbx6' target='_blank'>https://forms.gle/GVgJXbukX2biFjbx6</a><br>"
+        scenario2 += "アンケートURLはこちらです。対話が1つ終わるごとにアンケートに回答してください。<br><a href='https://forms.gle/4NGoWZ4LasGBJT8v8' target='_blank'>https://forms.gle/4NGoWZ4LasGBJT8v8</a><br>"
+
         for i, (no, history, summary) in enumerate(csv_data[j*3:j*3+3]):
             scenario1 += "<div class='data-scenario no{}'>".format(i+1)
             scenario1 += "<h3>{}つ目の対話</h3><small>{}</small>".format(i+1, no)
@@ -37,10 +41,7 @@ def load_csv_data(csv_file):
             scenario2 += "<br><ul><li>あなたは「Bさん」です。</li><li>あなたはAさんと交互にテキストチャットをしているところです。これまでの対話の流れをふまえて、Bさんになりきって対話してください。</li><li>最初はあなたから発話します。</li></ul>"
             scenario2 += "</div>"
 
-        scenario1 += "すべての対話が終了したらアンケートに回答してください。<a href='https://forms.gle/GVgJXbukX2biFjbx6'>https://forms.gle/GVgJXbukX2biFjbx6</a>"
         scenario1 += css
-
-        scenario2 += "すべての対話が終了したらアンケートに回答してください。<a href='https://forms.gle/4NGoWZ4LasGBJT8v8'>https://forms.gle/4NGoWZ4LasGBJT8v8</a>"
         scenario2 += css
 
         scenarios.append(("シナリオ{} A".format(j+1), scenario1, "Aさん"))
