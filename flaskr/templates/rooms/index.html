@@ -15,7 +15,7 @@
       {% if g.user.is_admin() %}
         <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} class="css-reset-a">
       {% else %}
-        <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} class="css-reset-a" onclick="return confirm('このルームに入室しますか？')">
+      <a href={{ url_for('rooms.show', hash_id=room.hash_id) }} class="css-reset-a" onclick="return confirm('●注意●\n{{ room.name }} に入室しようとしています。\n一度入室すると他のルームには入室できなくなります。このルームに入室しますか？')">
       {% endif %}
 
         <header class="header">
