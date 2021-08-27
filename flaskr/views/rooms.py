@@ -91,7 +91,7 @@ def show(hash_id):
             room.include(user)
             scenarios = [room.fetch_scenario_of(user)]
 
-        current_app.logger.info(f"[/rooms/{hash_id}] {user}")
+        current_app.logger.info(f"[/rooms/{hash_id}] {user} {scenarios}")
         return render_template("rooms/show.html", room=room, scenarios=scenarios)
 
     except Exception as error:
