@@ -15,15 +15,26 @@ def test_index(client, auth, app):
     assert "ルーム新規登録".encode() in response.data
 
 def test_show(client, auth, app):
-    hash_id = get_hash_id(app, 2)
+    hash_id = get_hash_id(app, 3)
 
-    # [GET]
-    auth.login()
+    # [GET] 1人目
+    auth.login(name="test2", password="test2")
     response = client.get("/rooms/{}".format(hash_id))
     assert 200 == response.status_code
+    assert "scenario1".encode() in response.data
+    assert "scenario2".encode() not in response.data
 
-    with app.app_context():
-        assert "メッセージ".encode() in response.data
+    # [GET] 2人目
+    auth.login(name="test3", password="test3")
+    response = client.get("/rooms/{}".format(hash_id))
+    assert 200 == response.status_code
+    assert "scenario1".encode() not in response.data
+    assert "scenario2".encode() in response.data
+
+    # [GET] 3人目
+    auth.login(name="test4", password="test4")
+    response = client.get("/rooms/{}".format(hash_id))
+    assert "ルームは満員です。".encode() not in response.data
 
 def test_edit(client, auth, app):
     hash_id = get_hash_id(app, 2)
