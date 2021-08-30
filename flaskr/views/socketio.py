@@ -6,6 +6,7 @@ from flaskr.views.rooms import fetch_user, fetch_room_from_hash_id
 
 
 clients = set()
+global_clients = set()
 
 
 def send_room_message(user, hash_id, text, save=True, classname=""):
@@ -26,6 +27,20 @@ def send_room_message(user, hash_id, text, save=True, classname=""):
 
         current_app.logger.info(f"[/rooms/{hash_id}] {user} {message}")
 
+
+@socketio.on("global_join")
+def on_global_join(payload):
+    """
+    [socketio] global_join
+
+    システム接続時のイベント
+    """
+
+    user = fetch_user()
+
+    if not user.is_admin():
+        global_clients.add(user.name)
+        emit("global_user", {"users": list(global_clients)}, broadcast=True)
 
 @socketio.on("join")
 def on_join(payload):
@@ -66,6 +81,8 @@ def on_disconnect():
 
         clients.discard(user.name)
         emit("room_user", {"users": list(clients)}, room=hash_id)
+        global_clients.discard(user.name)
+        emit("global_user", {"users": list(global_clients)}, broadcast=True)
 
 @socketio.on("meta_start_message")
 def on_meta_start_message():

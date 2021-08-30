@@ -230,6 +230,11 @@ main {
 .card.room.使用済み:hover { border-color: var(--color--green-dark); }
 .card.room.使用済み:hover .header { background: var(--color--green-dark); }
 
+.user_name {
+  color: var(--color--black-alpha);
+}
+.user_name.active { color: inherit; }
+
 
 /* rooms/show.html */
 

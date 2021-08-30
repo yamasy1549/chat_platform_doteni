@@ -9,6 +9,11 @@
     {% endif %}
   </header>
 
+  <div>
+    現在の接続ユーザ数 <span id="userCount">0</span>人
+    <span id="userList"></span>
+  </div>
+
   <ol class="card_showcase css-reset-list">
   {% for room in rooms %}
       <li class="card room {{ room.status.to_text() }}">
@@ -28,7 +33,7 @@
         <div class="body">
           <ul>
             {% for user in room.users %}
-            <li>{{ user.name }}</li>
+            <li class="user_name" id="activeUser-{{ user.name }}">{{ user.name }}</li>
             {% endfor %}
           </ul>
         </div>
@@ -44,4 +49,47 @@
     <li>ルームがありません。</li>
   {% endfor %}
   </ol>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
+    const userCount = document.getElementById("userCount");
+    const userList = document.getElementById("userList");
+
+    //////////////////////////////
+    // ここからソケット通信関連 //
+
+    const socket = io();
+
+    socket.on("connect", function() {
+      socket.emit("global_join", {});
+    });
+
+    socket.on("global_user", function(payload) {
+      // 現在の接続人数を表示
+      userCount.innerText = payload.users.length;
+
+      // ユーザ名を表示
+      const userNameList = payload.users;
+      if(userNameList.length > 0) {
+        userList.innerText = `（${userNameList.join(", ")}）`;
+      } else {
+        userList.innerText = "";
+      }
+
+      const activeUserList = document.querySelectorAll(".user_name");
+      activeUserList.forEach(function(element) {
+        element.classList.remove("active")
+      });
+
+      userNameList.forEach(function(name) {
+        const element = document.getElementById(`activeUser-${name}`);
+        element.classList.add("active")
+      });
+    });
+
+    // ここまでソケット通信関連 //
+    //////////////////////////////
+
+
+  </script>
 {% endblock %}
