@@ -75,31 +75,31 @@
       socket.emit("join", {
         hash_id: hash_id,
       });
+    });
 
-      // 入室時（初回の入室とは限らないことに注意）のメッセージを受信
-      socket.on("room_user", function(payload) {
-        // 現在の接続人数を表示
-        userCount.innerText = payload.users.length;
+    // 入室時（初回の入室とは限らないことに注意）のメッセージを受信
+    socket.on("room_user", function(payload) {
+      // 現在の接続人数を表示
+      userCount.innerText = payload.users.length;
 
-        // ユーザ名を表示
-        const userNameList = payload.users;
-        userList.innerText = `（${userNameList.join(", ")}）`;
-      });
+      // ユーザ名を表示
+      const userNameList = payload.users;
+      userList.innerText = `（${userNameList.join(", ")}）`;
+    });
 
-      // ルームに対するメッセージを受信
-      socket.on("room_message", function(payload) {
-        // メッセージ表示DOMを追加する
-        const li = document.createElement("li");
-        const div = document.createElement("div");
-        const content = document.createTextNode(`${payload.name}: ${payload.text}`);
-        div.classList.add("message");
-        div.appendChild(content);
-        li.appendChild(div);
-        messageList.appendChild(li);
+    // ルームに対するメッセージを受信
+    socket.on("room_message", function(payload) {
+      // メッセージ表示DOMを追加する
+      const li = document.createElement("li");
+      const div = document.createElement("div");
+      const content = document.createTextNode(`${payload.name}: ${payload.text}`);
+      div.classList.add("message");
+      div.appendChild(content);
+      li.appendChild(div);
+      messageList.appendChild(li);
 
-        // 自動で一番下までスクロール
-        scrollArea.scrollTop = scrollArea.scrollHeight
-      });
+      // 自動で一番下までスクロール
+      scrollArea.scrollTop = scrollArea.scrollHeight;
     });
 
     // 送信ボタンクリック時
