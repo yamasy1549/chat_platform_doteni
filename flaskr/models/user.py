@@ -3,7 +3,7 @@ from sqlalchemy.orm import synonym, validates
 from werkzeug.security import check_password_hash, generate_password_hash
 from flaskr.core import db
 from flaskr.models.error import ValidationError
-from flaskr.models.room_user import room_users
+from flaskr.models import Room, Status
 
 
 class Role(enum.Enum):
@@ -117,5 +117,8 @@ class User(db.Model):
         bool
         """
 
-        rooms = self.rooms
-        return len(rooms) > 0
+        my_rooms = Room.query \
+                .filter(Room.status==Status.OCCUPIED) \
+                .join(Room.users, aliased=True).filter_by(id=self.id) \
+                .all()
+        return len(my_rooms) > 0

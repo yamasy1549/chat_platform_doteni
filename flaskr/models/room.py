@@ -4,7 +4,7 @@ from sqlalchemy.orm import validates
 from flaskr.core import db
 from flaskr.models.error import ValidationError
 from flaskr.models.room_scenario import room_scenarios
-from flaskr.models.room_user import room_users
+from flaskr.models.room_user import RoomUser
 
 
 def generate_hash_id():
@@ -35,8 +35,8 @@ class Room(db.Model):
     hash_id = db.Column("hash_id", db.String(100),  nullable=False,   default=generate_hash_id)
     name    = db.Column("name",    db.String(100),  nullable=False,   default="")
     status  = db.Column("status",  db.Enum(Status), nullable=False,   default=Status.UNAVAILABLE)
-    scenarios = db.relationship("Scenario", secondary=room_scenarios, lazy="subquery", backref=db.backref("rooms", lazy=True))
-    users     = db.relationship("User",     secondary=room_users,     lazy="subquery", backref=db.backref("rooms", lazy=True))
+    scenarios = db.relationship("Scenario", secondary="room_scenarios", lazy="subquery", backref=db.backref("rooms", lazy=True))
+    users     = db.relationship("User",     secondary="room_users",     lazy="subquery", order_by="RoomUser.timestamp", backref=db.backref("rooms", lazy=True))
     messages  = db.relationship("Message", backref="rooms", lazy=True)
 
     @validates("name")
