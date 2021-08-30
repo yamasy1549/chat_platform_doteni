@@ -1,3 +1,5 @@
+import datetime
+from sqlalchemy import DateTime
 from sqlalchemy.orm import validates
 from flaskr.core import db
 from flaskr.models.error import ValidationError
@@ -6,10 +8,11 @@ from flaskr.models.error import ValidationError
 class Message(db.Model):
     __tablename__ = "messages"
 
-    id      = db.Column("id",       db.Integer,     primary_key=True)
-    text    = db.Column("status",   db.String(100), nullable=False)
-    room_id = db.Column("room_id",  db.Integer, db.ForeignKey("rooms.id"), nullable=False)
-    user_id = db.Column("user_id",  db.Integer, db.ForeignKey("users.id"), nullable=False)
+    id        = db.Column("id",        db.Integer,     primary_key=True)
+    text      = db.Column("status",    db.String(100), nullable=False)
+    room_id   = db.Column("room_id",   db.Integer, db.ForeignKey("rooms.id"), nullable=False)
+    user_id   = db.Column("user_id",   db.Integer, db.ForeignKey("users.id"), nullable=False)
+    timestamp = db.Column("timestamp", DateTime, default=datetime.datetime.utcnow)
 
     @validates("text")
     def validate_text(self, key, value):
