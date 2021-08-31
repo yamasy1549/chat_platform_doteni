@@ -4,3 +4,5 @@
 flaskr/*.db
 __pycache__
 logs
+
+*.pem
