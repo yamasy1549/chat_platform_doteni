@@ -9,10 +9,12 @@
     {% endif %}
   </header>
 
+  <!--
   <div>
     現在の接続ユーザ数 <span id="userCount">0</span>人
     <span id="userList"></span>
   </div>
+  -->
 
   <ol class="card_showcase css-reset-list">
   {% for room in rooms %}
@@ -33,7 +35,7 @@
         <div class="body">
           <ul>
             {% for user in room.users %}
-            <li class="user_name" id="activeUser-{{ user.name }}">{{ user.name }}</li>
+            <li class="user_name active" id="activeUser-{{ user.name }}">{{ user.name }}</li>
             {% endfor %}
           </ul>
         </div>
@@ -75,18 +77,6 @@
       } else {
         userList.innerText = "";
       }
-
-      const activeUserList = document.querySelectorAll(".user_name");
-      activeUserList.forEach(function(element) {
-        element.classList.remove("active");
-      });
-
-      userNameList.forEach(function(name) {
-        const element = document.getElementById(`activeUser-${name}`);
-        if(element) {
-          element.classList.add("active");
-        }
-      });
     });
 
     // ここまでソケット通信関連 //
