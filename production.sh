@@ -1,4 +1,8 @@
-# DockerイメージをビルドしてECRへでアップロード
+# （初回のみ）ECSでクラスタを作成するには
+# ecs-cli up --capability-iam --instance-type t2.medium --keypair キーペア名
+
+
+# DockerイメージをビルドしてECRへアップロード
 docker context use default
 aws ecr get-login-password --region ap-northeast-1 | docker login --username AWS --password-stdin 154234079813.dkr.ecr.ap-northeast-1.amazonaws.com
 
@@ -7,10 +11,6 @@ docker build -t chat_platform_doteni_nginx:latest -f ./config_nginx/Dockerfile.p
 docker tag chat_platform_doteni_uwsgi:latest 154234079813.dkr.ecr.ap-northeast-1.amazonaws.com/chat_platform_doteni_uwsgi:latest
 docker tag chat_platform_doteni_nginx:latest 154234079813.dkr.ecr.ap-northeast-1.amazonaws.com/chat_platform_doteni_nginx:latest
 docker-compose -f docker-compose.yml -f docker-compose.production.yml push
-
-
-# （初回のみ）ECSでクラスタを作成するには
-# ecs-cli up --capability-iam --instance-type t2.medium --keypair キーペア名
 
 
 # ECSへデプロイ
