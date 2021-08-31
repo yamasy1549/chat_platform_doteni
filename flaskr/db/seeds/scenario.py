@@ -16,6 +16,7 @@ def load_csv_data(csv_file):
     .data-scenario.no2 { background: blanchedalmond; }
     .data-scenario.no3 { background: lavenderblush; }
     .data-scenario.no4 { background: palegoldenrod; }
+    .data-scenario ul { background: white; padding: 10px 10px 10px 40px; border: var(--color--red) 1px solid; }
     .data-scenario li { color: var(--color--red); }
     </style>
     """
@@ -32,13 +33,13 @@ def load_csv_data(csv_file):
             scenario1 += "<div class='data-scenario no{}'>".format(i+1)
             scenario1 += "<h3>{}つ目の対話</h3><small>{}</small>".format(i+1, no)
             scenario1 += "<pre>{}</pre>".format(history.strip())
-            scenario1 += "<br><ul><li>あなたは「Aさん」です。</li><li>あなたはBさんと交互にテキストチャットをしているところです。Aさんになりきって、これまでの対話の流れをふまえてできるだけ同じ話題で対話してください。</li><li>最初はBさんから発話します。</li></ul>"
+            scenario1 += "<ul><li>あなたは「Aさん」です。</li><li>あなたはBさんと交互にテキストチャットをしているところです。Aさんになりきって、これまでに出てきた話題に沿って対話してください。全く新しい話題に変えることは避けてください。</li><li>最初はBさんから発話します。</li></ul>"
             scenario1 += "</div>"
 
             scenario2 += "<div class='data-scenario no{}'>".format(i+1)
             scenario2 += "<h3>{}つ目の対話</h3><small>{}</small>".format(i+1, no)
             scenario2 += "<pre>{}</pre>".format(summary.strip())
-            scenario2 += "<br><ul><li>あなたは「Bさん」です。</li><li>あなたはAさんと交互にテキストチャットをしているところです。これまでの対話の流れをふまえて、Bさんになりきって対話してください。</li><li>最初はあなたから発話します。</li></ul>"
+            scenario2 += "<ul><li>あなたは「Bさん」です。</li><li>Bさんになりきって、これまでの話題に沿って対話してください。全く新しい話題に変えることは避けてください。</li><li>最初はあなたから発話します。</li></ul>"
             scenario2 += "</div>"
 
         scenario1 += css
