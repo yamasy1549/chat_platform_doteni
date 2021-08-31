@@ -2,22 +2,21 @@ version: "2"
 services:
 
   uwsgi:
-    image: "yamasy1549/chat_platform_doteni_uwsgi"
+    build:
+      context: .
     ports:
       - "3031:3031"
     environment:
       TZ: "Asia/Tokyo"
-    logging:
-      driver: "awslogs"
-      options:
-        awslogs-region: "ap-northeast-1"
-        awslogs-group: "uwsgi"
+    command: "uwsgi --ini /var/www/config_uwsgi/uwsgi.ini"
 
   nginx:
-    image: "yamasy1549/chat_platform_doteni_nginx"
-    links:
-      - uwsgi
+    build:
+      context: .
     ports:
       - "80:80"
     environment:
       TZ: "Asia/Tokyo"
+    links:
+      - uwsgi
+    command: "nginx -g 'daemon off;' -c /etc/nginx/nginx.conf"

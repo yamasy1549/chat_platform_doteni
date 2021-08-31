@@ -78,12 +78,14 @@
 
       const activeUserList = document.querySelectorAll(".user_name");
       activeUserList.forEach(function(element) {
-        element.classList.remove("active")
+        element.classList.remove("active");
       });
 
       userNameList.forEach(function(name) {
         const element = document.getElementById(`activeUser-${name}`);
-        element.classList.add("active")
+        if(element) {
+          element.classList.add("active");
+        }
       });
     });
 

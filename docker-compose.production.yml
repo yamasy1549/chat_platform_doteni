@@ -1,0 +1,13 @@
+version: "2"
+services:
+
+  uwsgi:
+    image: "154234079813.dkr.ecr.ap-northeast-1.amazonaws.com/chat_platform_doteni_uwsgi"
+    logging:
+      driver: "awslogs"
+      options:
+        awslogs-region: "ap-northeast-1"
+        awslogs-group: "uwsgi"
+
+  nginx:
+    image: "154234079813.dkr.ecr.ap-northeast-1.amazonaws.com/chat_platform_doteni_nginx"

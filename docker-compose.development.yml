@@ -1,0 +1,20 @@
+version: "2"
+services:
+
+  uwsgi:
+    build:
+      context: .
+      dockerfile: ./config_uwsgi/Dockerfile.development
+    volumes:
+      - "$PWD:/var/www"
+    environment:
+      DEBUG: "true"
+      FLASK_ENV: "development"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./config_nginx/Dockerfile.development
+    volumes:
+      - "./config_nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "./flaskr/static:/var/static"

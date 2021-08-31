@@ -1,0 +1,11 @@
+FROM python:3.8
+
+WORKDIR /var/www
+
+COPY ./requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY ./config_uwsgi/uwsgi_init.sh ./
+RUN /bin/bash uwsgi_init.sh
+
+EXPOSE 3031

@@ -32,7 +32,7 @@ def load_csv_data(csv_file):
             scenario1 += "<div class='data-scenario no{}'>".format(i+1)
             scenario1 += "<h3>{}つ目の対話</h3><small>{}</small>".format(i+1, no)
             scenario1 += "<pre>{}</pre>".format(history.strip())
-            scenario1 += "<br><ul><li>あなたは「Aさん」です。</li><li>あなたはBさんと交互にテキストチャットをしているところです。これまでの対話の流れをふまえて、Aさんになりきって対話してください。</li><li>最初はBさんから発話します。</li></ul>"
+            scenario1 += "<br><ul><li>あなたは「Aさん」です。</li><li>あなたはBさんと交互にテキストチャットをしているところです。Aさんになりきって、これまでの対話の流れをふまえてできるだけ同じ話題で対話してください。</li><li>最初はBさんから発話します。</li></ul>"
             scenario1 += "</div>"
 
             scenario2 += "<div class='data-scenario no{}'>".format(i+1)
